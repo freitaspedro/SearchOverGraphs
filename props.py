@@ -57,18 +57,30 @@ def get_comps(g, directed):
 def get_all_names(g):
     names = []
     for v in g.vertices():
-        names.append(int(g.vp.name[v]))
+        names.append(g.vp.name[v])
     return names
 
 def get_v_names_ranks(g, mlist):
     nrank = []
     for v in mlist:
-        nrank.append((int(g.vp.name[v]), g.vp.rank[v]))
+        nrank.append((g.vp.name[v], g.vp.rank[v]))
     return nrank
 
 def get_v_names(g, mlist):
     names = []
     for v in mlist:
-        names.append(int(g.vp.name[v]))
+        names.append(g.vp.names[v])
     return names
+
+def get_v_labels_ranks(g, mlist):
+    lrank = []
+    for v in mlist:
+        lrank.append((g.vp.label[v], g.vp.rank[v]))
+    return lrank
+
+def get_v_labels(g, mlist):
+    labels = []
+    for v in mlist:
+        labels.append(g.vp.label[v])
+    return labels
 

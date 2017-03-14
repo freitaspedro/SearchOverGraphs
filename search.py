@@ -7,28 +7,42 @@ Esse modulo contem os tipos de busca sobre grafo (bfs e busca heuristica)
 import graph_tool.all as gt
 import props
 
-class VisitorBudget(gt.BFSVisitor):
+class BFSVisitorBudget(gt.BFSVisitor):
 
-    def __init__(self, name, feat, budget):
-        self.name = name
-        self.feat = feat
+    def __init__(self, value, budget):
+        self.value = value
         self.budget = budget
         self.visited = []
         self.positive_count = 0
 
-    # def discover_vertex(self, u):
-        # print "-->", self.name[u], "has been discovered!"
-
     def examine_vertex(self, u):
-        if len(self.visited) < self.budget:         # TODO: pode ser otimizado se a bfs parar quando atingir orcamento
+        if len(self.visited) < self.budget:         # TODO: pode ser otimizado se a bfs parar quando atingir budget
             self.visited.append(u)
-            if self.feat[u] == 1:
+            if self.value[u] == 1:
                 self.positive_count += 1
-        # print self.name[u], "has been examined..."
 
 def breadth_first_search(g, start, budget):
-    visitor = VisitorBudget(g.vp.name, g.vp.feat, budget)
+    visitor = BFSVisitorBudget(g.vp.value, budget)
     gt.bfs_search(g, start, visitor)
+    return visitor.positive_count, visitor.visited
+
+class DFSVisitorBudget(gt.DFSVisitor):
+
+    def __init__(self, value, budget):
+        self.value = value
+        self.budget = budget
+        self.visited = []
+        self.positive_count = 0
+
+    def discover_vertex(self, u):
+        if len(self.visited) < self.budget:         # TODO: pode ser otimizado se a dfs parar quando atingir budget
+            self.visited.append(u)
+            if self.value[u] == 1:
+                self.positive_count += 1
+
+def depth_first_search(g, start, budget):
+    visitor = DFSVisitorBudget(g.vp.value, budget)
+    gt.dfs_search(g, start, visitor)
     return visitor.positive_count, visitor.visited
 
 def heuristic(g, v, pt, pd, pn):
@@ -44,8 +58,9 @@ def heu_search(g, start, budget, pt, pd, pn):
     discovered.remove(start)
     i = 1
     while i < budget:
-        # print "start", g.vp.name[start]
-        if g.vp.feat[start] == 1:
+        # print "start", g.vp.name[start]           # csv
+        # print "start", g.vp.label[start]              # gml
+        if g.vp.value[start] == 1:
             positives = positives + 1
             for n in start.out_neighbours():
                 g.vp.numt[n] = g.vp.numt[n] + 1
@@ -55,7 +70,8 @@ def heu_search(g, start, budget, pt, pd, pn):
                 g.vp.numn[n] = g.vp.numn[n] + 1
                 g.vp.rank[n] = heuristic(g, n, pt, pd, pn)
         discovered = sorted(discovered, key=lambda n: g.vp.rank[n])
-        # print "discovered", props.get_v_names_ranks(g, discovered)
+        # print "discovered", props.get_v_names_ranks(g, discovered)            # csv
+        # print "discovered", props.get_v_labels_ranks(g, discovered)               # gml
         start = discovered.pop()                # err: 'start' pode ser um vertice nao descoberto ainda
         explored.append(start)
         i = i + 1

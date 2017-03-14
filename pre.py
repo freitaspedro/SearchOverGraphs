@@ -32,18 +32,21 @@ def write_dict_txt(name, mdict):
             f.write("%s   %s\n" % (k, v))
     print "%s saved" % name
 
-def props_draw_save(name, directed):
+def props_draw_save(name, isdirected, isgml):
     pr = []
     pr.append(props.get_name(name))
-    pr.append(props.is_directed(directed))
-
-    g = gt.load_graph_from_csv(name+".edges.csv", directed=directed)
+    pr.append(props.is_directed(isdirected))
+    if isgml:
+        g = gt.load_graph(name)
+        g.set_directed(isdirected)
+    else:
+        g = gt.load_graph_from_csv(name+".edges.csv", directed=isdirected)
     pr.append(props.get_num_vertices(g))
     pr.append(props.get_num_edges(g))
     pr.append(props.get_diameter(g))
     pr.append(props.get_avg_degrees(g))
     pr.append(props.get_global_clustering(g))
-    pr.append(props.get_comps(g, directed))
+    pr.append(props.get_comps(g, isdirected))
     write_txt(name+".props.txt", pr)
 
     out_degree_dist, in_degree_dist =  props.get_degree_dist(g)
@@ -53,11 +56,16 @@ def props_draw_save(name, directed):
     gt.graph_draw(g, output=name+".png")
     print "%s.png saved" % name
 
-def main(name, headers, directed):
-    txt_to_csv(name+".feat", headers)
-    txt_to_csv(name+".edges", 0)
-    props_draw_save(name, directed)
+def main(name, headers, isdirected):
+    if headers == -1:       # gml
+        props_draw_save(name, isdirected, True)
+    else:           # csv
+        txt_to_csv(name+".feat", headers)
+        txt_to_csv(name+".edges", 0)
+        props_draw_save(name, isdirected, False)
 
 
 if __name__ == "__main__":
-    main("snap/facebook/1912", 481, False)
+    # main("snap/facebook/1912", 481, False)
+    # main("snap/gplus/116807883656585676940", 3751, False)
+    main("uci/polblogs/polblogs.gml", -1, False)
