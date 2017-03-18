@@ -57,7 +57,7 @@ def props_draw_save(name, isdirected, isgml):
     print "%s.png saved" % name
 
 def main(name, headers, isdirected):
-    if headers == -1:       # polblogs
+    if headers == -1:       # polblogs, polbooks
         props_draw_save(name, isdirected, True)
     else:           # egonets - facebook, gplus, twitter
         txt_to_csv(name+".feat", headers)
@@ -69,4 +69,5 @@ if __name__ == "__main__":
     # main("snap/facebook/1912", 481, False)
     # main("snap/gplus/116807883656585676940", 3751, False)
     # main("uci/polblogs/polblogs.gml", -1, False)
-    main("snap/twitter/256497288", 1359, False)
+    # main("snap/twitter/256497288", 1359, False)
+    main("uci/polbooks/polbooks.gml", -1, False)

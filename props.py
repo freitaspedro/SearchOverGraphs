@@ -83,4 +83,3 @@ def get_v_labels(g, mlist):
     for v in mlist:
         labels.append(g.vp.label[v])
     return labels
-

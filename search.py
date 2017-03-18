@@ -18,7 +18,7 @@ class BFSVisitorBudget(gt.BFSVisitor):
     def examine_vertex(self, u):
         if len(self.visited) < self.budget:         # TODO: pode ser otimizado se a bfs parar quando atingir budget
             self.visited.append(u)
-            if self.value[u] == 1:
+            if int(self.value[u]) == 1:
                 self.positive_count += 1
 
 def breadth_first_search(g, start, budget):
@@ -37,7 +37,7 @@ class DFSVisitorBudget(gt.DFSVisitor):
     def discover_vertex(self, u):
         if len(self.visited) < self.budget:         # TODO: pode ser otimizado se a dfs parar quando atingir budget
             self.visited.append(u)
-            if self.value[u] == 1:
+            if int(self.value[u]) == 1:
                 self.positive_count += 1
 
 def depth_first_search(g, start, budget):
@@ -83,7 +83,7 @@ def ot_heu_search(g, start, budget, pt, pd, pn, mtype):
     explored.append(start)
     i = 1
     while i < budget:
-        if g.vp.value[start] == 1:          # ao explorar o vertice constata que ele tem a caracteristica
+        if int(g.vp.value[start]) == 1:          # ao explorar o vertice constata que ele tem a caracteristica
             positives = positives + 1
             for n in start.out_neighbours():
                 if n not in discovered:
@@ -115,8 +115,8 @@ def heu_search(g, start, budget, pt, pd, pn, mtype):
     i = 1
     while i < budget:
         # print "start", g.vp.name[start]           # egonets - facebook, gplus, twitter
-        # print "start", g.vp.label[start]              # polblogs
-        if g.vp.value[start] == 1:
+        # print "start", g.vp.label[start]              # polblogs, polbooks
+        if int(g.vp.value[start]) == 1:
             positives = positives + 1
             for n in start.out_neighbours():
                 g.vp.numt[n] = g.vp.numt[n] + 1
@@ -142,16 +142,16 @@ def pure_heu_search(g, start, budget, pt, pd, pn, mtype):
     i = 1
     while i < budget:
         # print "start", g.vp.name[start]           # egonets - facebook, gplus, twitter
-        # print "start", g.vp.label[start]              # polblogs
+        # print "start", g.vp.label[start]              # polblogs, polbooks
         for n in start.out_neighbours():
-            if g.vp.value[start] == 1:
+            if int(g.vp.value[start]) == 1:
                 g.vp.numt[n] = g.vp.numt[n] + 1
             else:
                 g.vp.numn[n] = g.vp.numn[n] + 1
             g.vp.rank[n] = heuristic(g, n, pt, pd, pn, mtype)
         discovered = sorted(discovered, key=lambda n: g.vp.rank[n])
         # print "discovered", props.get_v_names_ranks(g, discovered)            # egonets - facebook, gplus, twitter
-        # print "discovered", props.get_v_labels_ranks(g, discovered)               # polblogs
+        # print "discovered", props.get_v_labels_ranks(g, discovered)               # polblogs, polbooks
         start = discovered.pop()                # err: 'start' pode ser um vertice nao descoberto ainda
         explored.append(start)              # prox vertice a ser explorado
         i = i + 1
