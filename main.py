@@ -88,7 +88,7 @@ def display_save(name, feat_column, mtype, budget, sum_time, time, positives_mea
     print "%s saved" % filename
 
 
-def main(name, isdirected, feat_column, budget=0, runs=0):
+def main(name, isdirected, feat_column, initial_budget=0, step_size=0, steps=0, runs=0):
     if feat_column == "-1":             # polblogs, polbooks
         g = gt.load_graph(name)
         g.set_directed(isdirected)
@@ -108,7 +108,7 @@ def main(name, isdirected, feat_column, budget=0, runs=0):
             if g.vp.value[v] == "l":        # polbooks - feat_values = "c", "n" ou "l"
                 g.vp.value[v] = 1
                 positive_count += 1
-            elif g.vp.value[v] == "c" or g.vp.value[v] == "n":
+            elif g.vp.value[v] == "n" or g.vp.value[v] == "c":
                 g.vp.value[v] = 0
             g.vp.rank[v] = 0.0
             g.vp.kt[v] = 0
@@ -152,105 +152,128 @@ def main(name, isdirected, feat_column, budget=0, runs=0):
     pt_t = pt/float(1-pd)             # prob de ser 't'-'t' dado que temos um 't'
     pd_t = pd/float(1-pn)            # prob de ser 't'-'n' dado que temos um 'n'
     print "pt_t:", pt_t
-    print "pd_t", pd_t
+    print "pd_t:", pd_t
 
-    i = 0
-    bfs_positives_t, bfs_explored_t, bfs_time = [], [], []
-    dfs_positives_t, dfs_explored_t, dfs_time = [], [], []
-    heu1_positives_t, heu1_explored_t, heu1_time = [], [], []
-    heu2_positives_t, heu2_explored_t, heu2_time = [], [], []
-    heu3_positives_t, heu3_explored_t, heu3_time = [], [], []
-    mod_positives_t, mod_explored_t, mod_time = [], [], []
-    while i < runs:
-        # print "round", i
-        start = g.vertex(randint(0, g.num_vertices()))              # sorteia aleatoriamento um vertice
-        # print "start", g.vp.name[start]       # egonets - facebook, gplus, twitter
-        # print "start", g.vp.label[start]          # polblogs, polbooks
+    for i in range(0, steps+1):
+        budget = initial_budget+i*step_size
+        i = 0
+        bfs_positives_t, bfs_explored_t, bfs_time = [], [], []
+        # dfs_positives_t, dfs_explored_t, dfs_time = [], [], []
+        heu1_positives_t, heu1_explored_t, heu1_time = [], [], []
+        # heu2_positives_t, heu2_explored_t, heu2_time = [], [], []
+        heu3_positives_t, heu3_explored_t, heu3_time = [], [], []
+        # mod_positives_t, mod_explored_t, mod_time = [], [], []
+        while i < runs:
+            # print "round", i
+            start = g.vertex(randint(0, g.num_vertices()))              # sorteia aleatoriamento um vertice
+            # print "start", g.vp.name[start]       # egonets - facebook, gplus, twitter
+            # print "start", g.vp.label[start]          # polblogs, polbooks
 
-        start_time = time.time()
-        bfs_positives, bfs_explored = search.breadth_first_search(g, start, budget)         # breadth first search (BFS)
-        bfs_time.append(time.time() - start_time)
-        bfs_positives_t.append(bfs_positives)
-        bfs_explored_t.append(len(bfs_explored))
+            start_time = time.time()
+            bfs_positives, bfs_explored = search.breadth_first_search(g, start, budget)         # breadth first search (BFS)
+            bfs_time.append(time.time() - start_time)
+            bfs_positives_t.append(bfs_positives)
+            bfs_explored_t.append(len(bfs_explored))
 
-        start_time = time.time()
-        dfs_positives, dfs_explored = search.depth_first_search(g, start, budget)           # depth first search (DFS)
-        dfs_time.append(time.time() - start_time)
-        dfs_positives_t.append(dfs_positives)
-        dfs_explored_t.append(len(dfs_explored))
+            # start_time = time.time()
+            # dfs_positives, dfs_explored = search.depth_first_search(g, start, budget)           # depth first search (DFS)
+            # dfs_time.append(time.time() - start_time)
+            # dfs_positives_t.append(dfs_positives)
+            # dfs_explored_t.append(len(dfs_explored))
 
-        start_time = time.time()
-        heu1_positives, heu1_explored = search.ot_heu_search(g, start, budget, pt_t, pd_t, 1)            # ideia 1 - ocorrer em todas as arestas
-        heu1_time.append(time.time() - start_time)
-        heu1_positives_t.append(heu1_positives)
-        heu1_explored_t.append(len(heu1_explored))
+            start_time = time.time()
+            heu1_positives, heu1_explored = search.heu_search(g, start, budget, pt_t, pd_t, 1)            # ideia 1 - ocorrer em todas as arestas
+            heu1_time.append(time.time() - start_time)
+            heu1_positives_t.append(heu1_positives)
+            heu1_explored_t.append(len(heu1_explored))
 
-        start_time = time.time()
-        heu2_positives, heu2_explored = search.ot_heu_search(g, start, budget, pt_t, pd_t, 2)            # ideia 2 - ocorrer na maioria das arestas
-        heu2_time.append(time.time() - start_time)
-        heu2_positives_t.append(heu2_positives)
-        heu2_explored_t.append(len(heu2_explored))
+            # start_time = time.time()
+            # heu2_positives, heu2_explored = search.heu_search(g, start, budget, pt_t, pd_t, 2)            # ideia 2 - ocorrer na maioria das arestas
+            # heu2_time.append(time.time() - start_time)
+            # heu2_positives_t.append(heu2_positives)
+            # heu2_explored_t.append(len(heu2_explored))
 
-        start_time = time.time()
-        heu3_positives, heu3_explored = search.ot_heu_search(g, start, budget, pt_t, pd_t, 3)        # ideia 3 - ocorrer em pelo menos uma aresta
-        heu3_time.append(time.time() - start_time)
-        heu3_positives_t.append(heu3_positives)
-        heu3_explored_t.append(len(heu3_explored))
+            start_time = time.time()
+            heu3_positives, heu3_explored = search.heu_search(g, start, budget, pt_t, pd_t, 3)        # ideia 3 - ocorrer em pelo menos uma aresta
+            heu3_time.append(time.time() - start_time)
+            heu3_positives_t.append(heu3_positives)
+            heu3_explored_t.append(len(heu3_explored))
 
-        start_time = time.time()
-        mod_positives, mod_explored = search.mod(g, start, budget)        # maximum observed degree (mod)
-        mod_time.append(time.time() - start_time)
-        mod_positives_t.append(mod_positives)
-        mod_explored_t.append(len(mod_explored))
-        i = i + 1
+            # start_time = time.time()
+            # mod_positives, mod_explored = search.mod(g, start, budget)        # maximum observed degree (mod)
+            # mod_time.append(time.time() - start_time)
+            # mod_positives_t.append(mod_positives)
+            # mod_explored_t.append(len(mod_explored))
+            i = i + 1
 
-    display_save(name, feat_column, "BFS", budget, sum(bfs_time), statistics.mean(bfs_time), statistics.mean(bfs_positives_t),
-        statistics.pstdev(bfs_positives_t), statistics.mean(bfs_explored_t), statistics.pstdev(bfs_explored_t))
-    display_save(name, feat_column, "DFS", budget, sum(dfs_time), statistics.mean(dfs_time), statistics.mean(dfs_positives_t),
-        statistics.pstdev(dfs_positives_t), statistics.mean(dfs_explored_t), statistics.pstdev(dfs_explored_t))
-    display_save(name, feat_column, "HEU1", budget, sum(heu1_time), statistics.mean(heu1_time), statistics.mean(heu1_positives_t),
-        statistics.pstdev(heu1_positives_t), statistics.mean(heu1_explored_t), statistics.pstdev(heu1_explored_t))
-    display_save(name, feat_column, "HEU2", budget, sum(heu2_time), statistics.mean(heu2_time), statistics.mean(heu2_positives_t),
-        statistics.pstdev(heu2_positives_t), statistics.mean(heu2_explored_t), statistics.pstdev(heu2_explored_t))
-    display_save(name, feat_column, "HEU3", budget, sum(heu3_time), statistics.mean(heu3_time), statistics.mean(heu3_positives_t),
-        statistics.pstdev(heu3_positives_t), statistics.mean(heu3_explored_t), statistics.pstdev(heu3_explored_t))
-    display_save(name, feat_column, "MOD", budget, sum(mod_time), statistics.mean(mod_time), statistics.mean(mod_positives_t),
-        statistics.pstdev(mod_positives_t), statistics.mean(mod_explored_t), statistics.pstdev(mod_explored_t))
-
+        display_save(name, feat_column, "BFS", budget, sum(bfs_time), statistics.mean(bfs_time), statistics.mean(bfs_positives_t),
+            statistics.pstdev(bfs_positives_t), statistics.mean(bfs_explored_t), statistics.pstdev(bfs_explored_t))
+        # display_save(name, feat_column, "DFS", budget, sum(dfs_time), statistics.mean(dfs_time), statistics.mean(dfs_positives_t),
+        #     statistics.pstdev(dfs_positives_t), statistics.mean(dfs_explored_t), statistics.pstdev(dfs_explored_t))
+        display_save(name, feat_column, "HEU1", budget, sum(heu1_time), statistics.mean(heu1_time), statistics.mean(heu1_positives_t),
+            statistics.pstdev(heu1_positives_t), statistics.mean(heu1_explored_t), statistics.pstdev(heu1_explored_t))
+        # display_save(name, feat_column, "HEU2", budget, sum(heu2_time), statistics.mean(heu2_time), statistics.mean(heu2_positives_t),
+        #     statistics.pstdev(heu2_positives_t), statistics.mean(heu2_explored_t), statistics.pstdev(heu2_explored_t))
+        display_save(name, feat_column, "HEU3", budget, sum(heu3_time), statistics.mean(heu3_time), statistics.mean(heu3_positives_t),
+            statistics.pstdev(heu3_positives_t), statistics.mean(heu3_explored_t), statistics.pstdev(heu3_explored_t))
+        # display_save(name, feat_column, "MOD", budget, sum(mod_time), statistics.mean(mod_time), statistics.mean(mod_positives_t),
+        #     statistics.pstdev(mod_positives_t), statistics.mean(mod_explored_t), statistics.pstdev(mod_explored_t))
 
 if __name__ == "__main__":
     # 747 vertices, 60050 edges
-    # A - feat 119 - 63 positives (8.34437086093 percent) - pt=0.0465611990008 pd=0.231007493755 pn=0.722431307244 - pt_t= pd_t=
-    # B - feat 155 - 108 positives (14.3046357616 percent) - pt=0.121798501249 pd=0.286661115737 pn=0.591540383014 - pt_t= pd_t=
-    # C - feat 220 - 586 positives (77.6158940397 percent) - pt=0.750308076603 pd=0.225778517902 pn=0.0239134054954 - pt_t= pd_t=
-    # D - feat 219 - 222 positives (29.4039735099) - pt=0.132756036636 pd=0.413189009159 pn=0.454054954205 - pt_t= pd_t=
+    # A - feat 119 - 63 positives (8.34437086093 percent) - pt=0.0465611990008 pd=0.231007493755 pn=0.722431307244
+    # - pt_t=0.0605483130495 pd_t=0.832253419726
+    # B - feat 155 - 108 positives (14.3046357616 percent) - pt=0.121798501249 pd=0.286661115737 pn=0.591540383014
+    # - pt_t=0.170744233822 pd_t=0.701810176125
+    # C - feat 220 - 586 positives (77.6158940397 percent) - pt=0.750308076603 pd=0.225778517902 pn=0.0239134054954
+    # - pt_t=0.969112965672 pd_t=0.231309925956
+    # D - feat 219 - 222 positives (29.4039735099) - pt=0.132756036636 pd=0.413189009159 pn=0.454054954205
+    # - pt_t=0.226233043873 pd_t=0.756832601269
     # budget 20 - 340 (20)
-    for i in range(4, 10):
-        main("snap/facebook/1912", False, "119", i*20, 20)
+    main("snap/facebook/1912", False, "119", 20, 20, 16, 20)
+    # main("snap/facebook/1912", False, "155", 20, 20, 16, 20)          # dispensavel
+    # main("snap/facebook/1912", False, "220", 20, 20, 16, 20)
+    # main("snap/facebook/1912", False, "219", 20, 20, 16, 20)
 
     # 4872 vertices, 416992 edges
-    # A - feat 0 - 3528 positives (72.3395530039 percent) - pt=0.594615724043 pd=0.341582092702 pn=0.0638021832553 - pt_t= pd_t=
-    # B - feat 1 - 914 positives (18.7410293213 percent) - pt=0.0348927557363 pd=0.262163302893 pn=0.702943941371 - pt_t= pd_t=
-    # C - feat 154 - 521 positives (10.6827968013 percent) - pt=0.0443245913591 pd=0.211699505026 pn=0.743975903614 - pt_t= pd_t=
+    # A - feat 0 - 3528 positives (72.3395530039 percent) - pt=0.594615724043 pd=0.341582092702 pn=0.0638021832553
+    # - pt_t=0.903097739979 pd_t=0.364861022524
+    # B - feat 1 - 914 positives (18.7410293213 percent) - pt=0.0348927557363 pd=0.262163302893 pn=0.702943941371
+    # - pt_t=0.047290621181 pd_t=0.882538144829
+    # C - feat 154 - 521 positives (10.6827968013 percent) - pt=0.0443245913591 pd=0.211699505026 pn=0.743975903614
+    # - pt_t=0.0562280394871 pd_t=0.826873360809
     # budget 100 - 2500 (200)
-    # main("snap/gplus/116807883656585676940", False, "0", 100, 20)
+    # main("snap/gplus/116807883656585676940", False, "0", 100, 200, 12, 20)
+    # main("snap/gplus/116807883656585676940", False, "1", 100, 200, 12, 20)
+    # main("snap/gplus/116807883656585676940", False, "154", 100, 200, 12, 20)          # dispensavel
 
     # 1490 vertices, 19090 edges
-    # A - feat 0 (value 1) - 732 positives (49.1275167785 percent) - pt = 0.471136720796 pd = 0.0884232582504 pn = 0.440440020953 - pt_t= pd_t=
+    # A - feat 0 (value 1) - 732 positives (49.1275167785 percent) - pt=0.471136720796 pd=0.0884232582504 pn=0.440440020953
+    # - pt_t=0.516837145156 pd_t=0.158022842164
     # budget 50 - 750 (50)
-    # main("uci/polblogs/polblogs.gml", False, "-1", 50, 20)
+    # main("uci/polblogs/polblogs.gml", False, "-1", 50, 50, 14, 20)
 
     # 213 vertices, 17930 edges
-    # feat 369 - 27 positives (12.6168224299 percent) - pt = 0.0253764640268 pd = 0.263190184049  pn = 0.711433351924 - pt_t= pd_t=
-    # feat 475 - 54 positives (25.2336448598 percent) - pt = 0.0980479643056 pd = 0.425376464027 pn = 0.476575571668 - pt_t= pd_t=
-    # feat 478 - 17 positives (7.94392523364 percent) - pt = 0.00864472950363 pd = 0.172783045176 pn = 0.818572225321 - pt_t= pd_t=
-    # feat 889 - 103 positives (48.1308411215 percent) - pt = 0.359007250418 pd = 0.475906302287 pn = 0.165086447295 - pt_t= pd_t=
+    # feat 369 - 27 positives (12.6168224299 percent) - pt=0.0253764640268 pd=0.263190184049  pn=0.711433351924
+    # - pt_t=0.0344409961396 pd_t=0.912060301508
+    # feat 475 - 54 positives (25.2336448598 percent) - pt=0.0980479643056 pd=0.425376464027 pn=0.476575571668
+    # - pt_t= 0.170629913617 pd_t=0.812679808205
+    # feat 478 - 17 positives (7.94392523364 percent) - pt=0.00864472950363 pd=0.172783045176 pn=0.818572225321
+    # - pt_t=0.010450377562 pd_t=0.952351675377
+    # feat 889 - 103 positives (48.1308411215 percent) - pt=0.359007250418 pd=0.475906302287 pn=0.165086447295
+    # - pt_t=0.685005852932 pd_t=0.570006680027
     # budget 10 - 110 (10)
-    # main("snap/twitter/256497288", False, "889", 10, 20)
+    # main("snap/twitter/256497288", False, "369", 10, 10, 10, 20)
+    # main("snap/twitter/256497288", False, "475", 10, 10, 10, 20)
+    # main("snap/twitter/256497288", False, "478", 10, 10, 10, 20)          # dispensavel
+    # main("snap/twitter/256497288", False, "889", 10, 10, 10, 20)
 
     # 105 vertices, 441 edges
-    # feat 0 (value c) - 49 positives (46.6666666667 percent) - pt = 0.430839002268 pd = 0.104308390023 pn = 0.46485260771 - pt_t= pd_t=
-    # feat 1 (value n) - 13 positives (12.380952381 percent) - pt = 0.0204081632653 pd = 0.131519274376 pn = 0.848072562358 - pt_t= pd_t=
-    # feat 2 (value l) -  43 positives (46.6666666667 percent) - pt = 0.390022675737 pd = 0.0816326530612 pn = 0.528344671202 - pt_t= pd_t=
+    # feat 0 (value c) - 49 positives (46.6666666667 percent) - pt = 0.430839002268 pd = 0.104308390023 pn = 0.46485260771
+    # - pt_t=0.481012658228 pd_t=0.194915254237
+    # feat 1 (value n) - 13 positives (12.380952381 percent) - pt = 0.0204081632653 pd = 0.131519274376 pn = 0.848072562358
+    # - pt_t=0.023498694517 pd_t=0.865671641791
+    # feat 2 (value l) -  43 positives (46.6666666667 percent) - pt = 0.390022675737 pd = 0.0816326530612 pn = 0.528344671202
+    # - pt_t=0.424691358025 pd_t=0.173076923077
     # budget 10 - 50 (5)
-    # main("uci/polbooks/polbooks.gml", False, "-1", 50, 20)
+    # main("uci/polbooks/polbooks.gml", False, "-1", 10, 5, 8, 20)            # busca rotulo l

@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 
 '''
-Esse modulo contem os tipos de busca sobre grafo (bfs e busca heuristica)
+Esse modulo contem os tipos de busca sobre grafo (bfs e busca heuristica e mod)
 '''
 
 import graph_tool.all as gt
 import props
 import math
+import scipy
 
 class BFSVisitorBudget(gt.BFSVisitor):
 
@@ -46,20 +47,13 @@ def depth_first_search(g, start, budget):
     gt.dfs_search(g, start, visitor)
     return visitor.positive_count, visitor.visited
 
-def binom(x, y):
-    try:
-        binom = math.factorial(x) // math.factorial(y) // math.factorial(x - y)
-    except ValueError:
-        binom = 0
-    return binom
-
 def p_t_k(k, kt, kn, pt_t, pd_t):
     ini = max(0, k-kn)
     end = min(kt, k)
     sum_k = 0
     for i in range(ini, end):
-        # sum_k += binom(kt, i) * pt_t**i * (1-pt_t)**(kt-i) * binom(kn, k-i) * pd_t**(k-i) * (1-pd_t)**(kn-k+i)
-        sum_k += pt_t**i * (1-pt_t)**(kt-i) * pd_t**(k-i) * (1-pd_t)**(kn-k+i)
+        sum_k += scipy.special.binom(kt, i) * pt_t**i * (1-pt_t)**(kt-i) * scipy.special.binom(kn, k-i) * pd_t**(k-i) * (1-pd_t)**(kn-k+i)
+        # sum_k += pt_t**i * (1-pt_t)**(kt-i) * pd_t**(k-i) * (1-pd_t)**(kn-k+i)
     return sum_k
 
 def heuristic(pt_t, pd_t, kt, kn, mtype):
@@ -130,10 +124,10 @@ def heu_search(g, start, budget, pt_t, pd_t, mtype):
             for n in start.out_neighbours():
                 g.vp.kn[n] += 1
                 g.vp.rank[n] = heuristic(pt_t, pd_t, g.vp.kt[n], g.vp.kn[n], mtype)
-        # discovered = sorted(discovered, key=lambda n: g.vp.rank[n])
-        # start = discovered.pop()                # err: 'start' pode ser um vertice nao descoberto ainda
-        start = get_max_rank(g, discovered)
-        discovered.remove(start)
+        discovered = sorted(discovered, key=lambda n: g.vp.rank[n])
+        start = discovered.pop()                # err: 'start' pode ser um vertice nao descoberto ainda
+        # start = get_max_rank(g, discovered)
+        # discovered.remove(start)
         explored.append(start)              # prox vertice a ser explorado
         i += 1
     return positives, explored
