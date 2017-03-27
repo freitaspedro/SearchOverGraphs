@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 '''
-Esse modulo contem os tipos de busca sobre grafo (bfs e busca heuristica e mod)
+Esse modulo contem os tipos de busca sobre grafo (bfs, dfs, busca heuristica e mod)
 '''
 
 import graph_tool.all as gt
@@ -14,12 +14,12 @@ class BFSVisitorBudget(gt.BFSVisitor):
     def __init__(self, value, budget):
         self.value = value
         self.budget = budget
-        self.visited = []
+        self.visited = 0
         self.positive_count = 0
 
     def examine_vertex(self, u):
-        if len(self.visited) < self.budget:         # TODO: pode ser otimizado se a bfs parar quando atingir budget
-            self.visited.append(u)
+        if self.visited < self.budget:
+            self.visited += 1
             if int(self.value[u]) == 1:
                 self.positive_count += 1
 
@@ -33,12 +33,12 @@ class DFSVisitorBudget(gt.DFSVisitor):
     def __init__(self, value, budget):
         self.value = value
         self.budget = budget
-        self.visited = []
+        self.visited = 0
         self.positive_count = 0
 
     def discover_vertex(self, u):
-        if len(self.visited) < self.budget:         # TODO: pode ser otimizado se a dfs parar quando atingir budget
-            self.visited.append(u)
+        if self.visited < self.budget:
+            self.visited += 1
             if int(self.value[u]) == 1:
                 self.positive_count += 1
 
@@ -51,140 +51,105 @@ def p_t_k(k, kt, kn, pt_t, pd_t):
     ini = max(0, k-kn)
     end = min(kt, k)
     sum_k = 0
-    for i in range(ini, end):
-        sum_k += scipy.special.binom(kt, i) * pt_t**i * (1-pt_t)**(kt-i) * scipy.special.binom(kn, k-i) * pd_t**(k-i) * (1-pd_t)**(kn-k+i)
-        # sum_k += pt_t**i * (1-pt_t)**(kt-i) * pd_t**(k-i) * (1-pd_t)**(kn-k+i)
+    for i in xrange(ini, end):
+        # sum_k += scipy.special.binom(kt, i) * math.pow(pt_t, i) * math.pow(1-pt_t, kt-i) * scipy.special.binom(kn, k-i) * math.pow(pd_t, k-i) * math.pow(1-pd_t, kn-k+i)
+        sum_k += math.pow(pt_t, i) * math.pow(1-pt_t, kt-i) * math.pow(pd_t, k-i) * math.pow(1-pd_t, kn-k+i)
     return sum_k
 
 def heuristic(pt_t, pd_t, kt, kn, mtype):
     if mtype == 1:                  # ideia 1 - ocorrer em todas as arestas
-        return pt_t**kt * pd_t**kn
+        return math.pow(pt_t, kt) * math.pow(pd_t, kn)
     elif mtype == 2:                # ideia 2 - ocorrer na maioria das arestas
         pm = 0
         ini = int(math.ceil((kt+kn)/2.0))
         end = kt+kn
-        for i in range(ini, end):
+        for i in xrange(ini, end):
             pm += p_t_k(i, kt, kn, pt_t, pd_t)
         return pm
     elif mtype == 3:                # ideia 3 - ocorre em pelo menos uma aresta
-        return 1 - (1-pt_t)**kt * (1-pd_t)**kn
-
-def get_max_rank(g, l):
-    max_n = l[0]
-    for n in l:
-        if g.vp.rank[max_n] < g.vp.rank[n]:
-            max_n = n
-    return max_n
+        return 1 - math.pow(1-pt_t, kt) * math.pow(1-pd_t, kn)
 
 def ot_heu_search(g, start, budget, pt_t, pd_t, mtype):
+    for v in g.vertices():
+        g.vp.kt[v] = 0
+        g.vp.kn[v] = 0
+    num_vertices = g.num_vertices()
+    heu_values = [-1]*num_vertices
+    status = [-1]*num_vertices          # status -1 - desconhecido, status 0 - descoberto, status +1 - explorado
     positives = 0
-    explored, discovered = [], []
-    explored.append(start)
+    status[int(start)] = 1
     i = 1
     while i < budget:
+        # print "start", start
+        # neighbours = [int(n) for n in start.out_neighbours()]
+        # print "neighbours", len(neighbours)
         if int(g.vp.value[start]) == 1:          # ao explorar o vertice constata que ele tem a caracteristica
             positives += 1
             for n in start.out_neighbours():
-                if n not in discovered:
-                    discovered.append(n)            # adiciona os vertices vizinhos ao explorado a lista de descobertos
-                g.vp.kt[n] += 1
-                g.vp.rank[n] = heuristic(pt_t, pd_t, g.vp.kt[n], g.vp.kn[n], mtype)
+                if status[int(n)] == -1:            # vertice desconhecido passa a descoberto
+                    status[int(n)] = 0
+                if status[int(n)] == 0:     # incrementa kt e calcula heuristica para descobertos
+                    g.vp.kt[n] += 1
+                    heu_values[int(n)] = heuristic(pt_t, pd_t, g.vp.kt[n], g.vp.kn[n], mtype)
         else:                                       # constata que ele nao tem a caracteristica
             for n in start.out_neighbours():
-                if n not in discovered:
-                    discovered.append(n)
-                g.vp.kn[n] += 1
-                g.vp.rank[n] = heuristic(pt_t, pd_t, g.vp.kt[n], g.vp.kn[n], mtype)
-        if not discovered:
-            print "not discovered"
-            return positives, explored
-        else:
-            start = get_max_rank(g, discovered)
-            discovered.remove(start)
-            explored.append(start)              # prox vertice a ser explorado
+                if status[int(n)] == -1:
+                    status[int(n)] = 0
+                if status[int(n)] == 0:
+                    g.vp.kn[n] += 1
+                    heu_values[int(n)] = heuristic(pt_t, pd_t, g.vp.kt[n], g.vp.kn[n], mtype)
+        # print "heu_values", heu_values
+        max_heu = max(heu_values)
+        start = heu_values.index(max_heu)
+        # print "max %s (index %s)" % (heu_values[start], start)
+        # print "status 1 -", status.count(1)
+        # print "status 0 -", status.count(0)
+        # print "status -1 -", status.count(-1)
+        if max_heu < 0:                     # heuristica escolhida nunca pode ser negativa
+            print "err: max_heu negative"
+            return positives, i, i+status.count(0)
+        status[start] = 1
+        heu_values[start] = -10             # heuristica para vertice explorado recebe -10 para nunca mais ser escolhido
+        start = g.vertex(start)
         i += 1
-    return positives, explored
-
-def heu_search(g, start, budget, pt_t, pd_t, mtype):
-    positives = 0
-    explored = []
-    discovered = list(g.vertices())                 # err: 'discovered' nao devia conter todos os vertices do grafo
-    explored.append(start)                           # e sim apenas os vertices descobertos
-    discovered.remove(start)
-    i = 1
-    while i < budget:
-        # print "start", g.vp.name[start]           # egonets - facebook, gplus, twitter
-        # print "start", g.vp.label[start]              # polblogs, polbooks
-        if int(g.vp.value[start]) == 1:
-            positives += 1
-            for n in start.out_neighbours():
-                g.vp.kt[n] += 1
-                g.vp.rank[n] = heuristic(pt_t, pd_t, g.vp.kt[n], g.vp.kn[n], mtype)
-        else:
-            for n in start.out_neighbours():
-                g.vp.kn[n] += 1
-                g.vp.rank[n] = heuristic(pt_t, pd_t, g.vp.kt[n], g.vp.kn[n], mtype)
-        discovered = sorted(discovered, key=lambda n: g.vp.rank[n])
-        start = discovered.pop()                # err: 'start' pode ser um vertice nao descoberto ainda
-        # start = get_max_rank(g, discovered)
-        # discovered.remove(start)
-        explored.append(start)              # prox vertice a ser explorado
-        i += 1
-    return positives, explored
-
-def pure_heu_search(g, start, budget, pt_t, pd_t, mtype):
-    positives = 0
-    explored = []
-    discovered = list(g.vertices())                 # err: 'discovered' nao devia conter todos os vertices do grafo
-    explored.append(start)                           # e sim apenas os vertices descobertos
-    discovered.remove(start)
-    i = 1
-    while i < budget:
-        # print "start", g.vp.name[start]           # egonets - facebook, gplus, twitter
-        # print "start", g.vp.label[start]              # polblogs, polbooks
-        for n in start.out_neighbours():
-            if int(g.vp.value[start]) == 1:
-                g.vp.kt[n] += 1
-            else:
-                g.vp.kn[n] += 1
-            g.vp.rank[n] = heuristic(pt_t, pd_t, g.vp.kt[n], g.vp.kn[n], mtype)
-        discovered = sorted(discovered, key=lambda n: g.vp.rank[n])
-        # print "discovered", props.get_v_names_ranks(g, discovered)            # egonets - facebook, gplus, twitter
-        # print "discovered", props.get_v_labels_ranks(g, discovered)               # polblogs, polbooks
-        start = discovered.pop()                # err: 'start' pode ser um vertice nao descoberto ainda
-        explored.append(start)              # prox vertice a ser explorado
-        i += 1
-    return positives, explored
-
-def get_max_kt(g, l):
-    max_n = l[0]
-    for n in l:
-        if g.vp.kt[max_n] < g.vp.kt[n]:
-            max_n = n
-    return max_n
+    return positives, i, i+status.count(0)
 
 def mod(g, start, budget):
+    num_vertices = g.num_vertices()
+    status = [-1]*num_vertices          # status -1 - desconhecido, status 0 - descoberto, status +1 - explorado
+    kt_values = [-1]*num_vertices
     positives = 0
-    explored, discovered = [], []
-    explored.append(start)
+    status[int(start)] = 1
     i = 1
     while i < budget:
+        # print "start", start
+        # neighbours = [int(n) for n in start.out_neighbours()]
+        # print "neighbours", len(neighbours)
         if int(g.vp.value[start]) == 1:          # ao explorar o vertice constata que ele tem a caracteristica
             positives += 1
             for n in start.out_neighbours():
-                if n not in discovered:
-                    discovered.append(n)            # adiciona os vertices vizinhos ao explorado a lista de descobertos
-                g.vp.kt[n] += 1
+                if status[int(n)] == -1:
+                    status[int(n)] = 0
+                    kt_values[int(n)] = 0           # inicializa kt com 0 para os vertices descobertos
+                if status[int(n)] == 0:
+                    kt_values[int(n)] += 1
         else:                                       # constata que ele nao tem a caracteristica
             for n in start.out_neighbours():
-                if n not in discovered:
-                    discovered.append(n)
-        if not discovered:
-            print "not discovered"
-            return positives, explored
-        else:
-            start = get_max_kt(g, discovered)
-            discovered.remove(start)
-            explored.append(start)              # prox vertice a ser explorado
+                if status[int(n)] == -1:
+                    status[int(n)] = 0
+                    kt_values[int(n)] = 0
+       # print "kt_values", kt_values
+        max_kt = max(kt_values)
+        start = kt_values.index(max_kt)
+        # print "max %s (index %s)" % (kt_values[start], start)
+        # print "status 1 -", status.count(1)
+        # print "status 0 -", status.count(0)
+        # print "status -1 -", status.count(-1)
+        if max_kt < 0:
+            print "err: max_kt negative"
+            return positives, i, i+status.count(0)
+        status[start] = 1
+        kt_values[start] = -10
+        start = g.vertex(start)         # prox vertice a ser explorado
         i += 1
-    return positives, explored
+    return positives, i, i+status.count(0)

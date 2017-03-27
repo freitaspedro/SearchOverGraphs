@@ -60,23 +60,17 @@ def get_all_names(g):
         names.append(g.vp.name[v])
     return names
 
-def get_v_names_ranks(g, mlist):
-    nrank = []
-    for v in mlist:
-        nrank.append((g.vp.name[v], g.vp.rank[v]))
-    return nrank
-
 def get_v_names(g, mlist):
     names = []
     for v in mlist:
         names.append(g.vp.names[v])
     return names
 
-def get_v_labels_ranks(g, mlist):
-    lrank = []
-    for v in mlist:
-        lrank.append((g.vp.label[v], g.vp.rank[v]))
-    return lrank
+def get_all_labels(g):
+    labels = []
+    for v in g.vertices():
+        labels.append(g.vp.label[v])
+    return labels
 
 def get_v_labels(g, mlist):
     labels = []

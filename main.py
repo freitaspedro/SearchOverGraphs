@@ -14,8 +14,8 @@ import pandas
 import props
 import statistics
 import search
-from numpy.random import *
-seed(42)
+import random
+random.seed(42)
 import csv
 import os
 import time
@@ -28,7 +28,6 @@ def initialize_vertices(g, names, f_values, names_in):
             v = gt.find_vertex(g, g.vp.name, curr_name)
             v = int(v[0])
             g.vp.value[v] = f_values[i]
-            g.vp.rank[v] = 0.0
             g.vp.kt[v] = 0
             g.vp.kn[v] = 0
             cont = cont + 1
@@ -44,7 +43,6 @@ def initialize_vertices_0(g, rest):
         v = gt.find_vertex(g, g.vp.name, str(name))
         v = int(v[0])
         g.vp.value[v] = 0
-        g.vp.rank[v] = 0.0
         g.vp.kt[v] = 0
         g.vp.kn[v] = 0
 
@@ -70,35 +68,36 @@ def calculate_edges(g):
         pn = pn/float(num_edges)
     return pt, pd, pn
 
-def display_save(name, feat_column, mtype, budget, sum_time, time, positives_mean, positives_stdev, explored_mean, explored_stdev):
+def display_save(name, feat_column, mtype, budget, sum_time, time, positives_mean, positives_stdev, explored_mean,
+    explored_stdev, eplusd_mean, eplusd_stdev):
     print "---------------------------%s---------------------------" % mtype
     print "budget", budget
     print "total time %ss (%ss per run)" % (sum_time, time)
     print "mean positives %s     stdev positives %s" % (positives_mean, positives_stdev)
     print "mean explored %s     stdev explored %s" % (explored_mean, explored_stdev)
-
+    print "mean explored+discovered %s     stdev explored+discovered %s" % (eplusd_mean, eplusd_stdev)
+    '''
     filename = name+"_f"+feat_column+"_"+mtype+".search.csv"
     if not os.path.isfile(filename):
         out_csv = csv.writer(open(filename, "wb"))
-        out_csv.writerow(["budget", "time", "positives_mean", "positives_stdev", "explored_mean", "explored_stdev"])
-        out_csv.writerow([budget, time, positives_mean, positives_stdev, explored_mean, explored_stdev])
+        out_csv.writerow(["budget", "time", "positives_mean", "positives_stdev", "explored_mean", "explored_stdev",
+            "eplusd_mean", "eplusd_stdev"])
+        out_csv.writerow([budget, time, positives_mean, positives_stdev, explored_mean, explored_stdev, eplusd_mean, eplusd_stdev])
     else:
         out_csv = csv.writer(open(filename, "a"))
-        out_csv.writerow([budget, time, positives_mean, positives_stdev, explored_mean, explored_stdev])
+        out_csv.writerow([budget, time, positives_mean, positives_stdev, explored_mean, explored_stdev, eplusd_mean, eplusd_stdev])
     print "%s saved" % filename
-
+    '''
 
 def main(name, isdirected, feat_column, initial_budget=0, step_size=0, steps=0, runs=0):
     if feat_column == "-1":             # polblogs, polbooks
         g = gt.load_graph(name)
         g.set_directed(isdirected)
 
-        vprop1 = g.new_vertex_property("double")
+        vprop1 = g.new_vertex_property("int")
         vprop2 = g.new_vertex_property("int")
-        vprop3 = g.new_vertex_property("int")
-        g.vp.rank = vprop1
-        g.vp.kt = vprop2
-        g.vp.kn = vprop3
+        g.vp.kt = vprop1
+        g.vp.kn = vprop2
         # g.list_properties()
 
         positive_count = 0
@@ -110,7 +109,6 @@ def main(name, isdirected, feat_column, initial_budget=0, step_size=0, steps=0, 
                 positive_count += 1
             elif g.vp.value[v] == "n" or g.vp.value[v] == "c":
                 g.vp.value[v] = 0
-            g.vp.rank[v] = 0.0
             g.vp.kt[v] = 0
             g.vp.kn[v] = 0
 
@@ -129,13 +127,11 @@ def main(name, isdirected, feat_column, initial_budget=0, step_size=0, steps=0, 
 
         g = gt.load_graph_from_csv(name+".edges.csv", directed=isdirected)
         vprop = g.new_vertex_property("int")
-        vprop1 = g.new_vertex_property("double")
+        vprop1 = g.new_vertex_property("int")
         vprop2 = g.new_vertex_property("int")
-        vprop3 = g.new_vertex_property("int")
         g.vp.value = vprop
-        g.vp.rank = vprop1
-        g.vp.kt = vprop2
-        g.vp.kn = vprop3
+        g.vp.kt = vprop1
+        g.vp.kn = vprop2
         # g.list_properties()
         names_in = props.get_all_names(g)
         # print "names_in", names_in, len(names_in)
@@ -154,18 +150,26 @@ def main(name, isdirected, feat_column, initial_budget=0, step_size=0, steps=0, 
     print "pt_t:", pt_t
     print "pd_t:", pd_t
 
-    for i in range(0, steps+1):
+    l = gt.label_largest_component(g)
+    mlist = list(l.a)
+    out = [i for i, x in enumerate(mlist) if x==0]      # vertices fora da maior componente conexa
+    # print "out", out
+    glist = list(range(0, g.num_vertices()))
+    inn = list(set(glist) - set(out))
+    # print "inn", inn
+
+    for i in xrange(0, steps+1):
         budget = initial_budget+i*step_size
-        i = 0
+        j = 0
         bfs_positives_t, bfs_explored_t, bfs_time = [], [], []
-        # dfs_positives_t, dfs_explored_t, dfs_time = [], [], []
-        heu1_positives_t, heu1_explored_t, heu1_time = [], [], []
-        # heu2_positives_t, heu2_explored_t, heu2_time = [], [], []
-        heu3_positives_t, heu3_explored_t, heu3_time = [], [], []
-        # mod_positives_t, mod_explored_t, mod_time = [], [], []
-        while i < runs:
+        dfs_positives_t, dfs_explored_t, dfs_time = [], [], []
+        heu1_positives_t, heu1_explored_t, heu1_eplusd_t, heu1_time = [], [], [], []
+        heu2_positives_t, heu2_explored_t, heu2_eplusd_t, heu2_time = [], [], [], []
+        heu3_positives_t, heu3_explored_t, heu3_eplusd_t, heu3_time = [], [], [], []
+        mod_positives_t, mod_explored_t, mod_eplusd_t, mod_time = [], [], [], []
+        while j < runs:
             # print "round", i
-            start = g.vertex(randint(0, g.num_vertices()))              # sorteia aleatoriamento um vertice
+            start = g.vertex(random.choice(inn))              # sorteia aleatoriamento um vertice na maior componente conexa
             # print "start", g.vp.name[start]       # egonets - facebook, gplus, twitter
             # print "start", g.vp.label[start]          # polblogs, polbooks
 
@@ -173,51 +177,72 @@ def main(name, isdirected, feat_column, initial_budget=0, step_size=0, steps=0, 
             bfs_positives, bfs_explored = search.breadth_first_search(g, start, budget)         # breadth first search (BFS)
             bfs_time.append(time.time() - start_time)
             bfs_positives_t.append(bfs_positives)
-            bfs_explored_t.append(len(bfs_explored))
-
-            # start_time = time.time()
-            # dfs_positives, dfs_explored = search.depth_first_search(g, start, budget)           # depth first search (DFS)
-            # dfs_time.append(time.time() - start_time)
-            # dfs_positives_t.append(dfs_positives)
-            # dfs_explored_t.append(len(dfs_explored))
+            bfs_explored_t.append(bfs_explored)
 
             start_time = time.time()
-            heu1_positives, heu1_explored = search.heu_search(g, start, budget, pt_t, pd_t, 1)            # ideia 1 - ocorrer em todas as arestas
+            dfs_positives, dfs_explored = search.depth_first_search(g, start, budget)           # depth first search (DFS)
+            dfs_time.append(time.time() - start_time)
+            dfs_positives_t.append(dfs_positives)
+            dfs_explored_t.append(dfs_explored)
+
+            start_time = time.time()
+            # ideia 1 - ocorrer em todas as arestas
+            heu1_positives, heu1_explored, heu1_eplusd = search.ot_heu_search(g, start, budget, pt_t, pd_t, 1)
             heu1_time.append(time.time() - start_time)
             heu1_positives_t.append(heu1_positives)
-            heu1_explored_t.append(len(heu1_explored))
-
-            # start_time = time.time()
-            # heu2_positives, heu2_explored = search.heu_search(g, start, budget, pt_t, pd_t, 2)            # ideia 2 - ocorrer na maioria das arestas
-            # heu2_time.append(time.time() - start_time)
-            # heu2_positives_t.append(heu2_positives)
-            # heu2_explored_t.append(len(heu2_explored))
+            heu1_explored_t.append(heu1_explored)
+            heu1_eplusd_t.append(heu1_eplusd)
 
             start_time = time.time()
-            heu3_positives, heu3_explored = search.heu_search(g, start, budget, pt_t, pd_t, 3)        # ideia 3 - ocorrer em pelo menos uma aresta
+            # ideia 2 - ocorrer na maioria das arestas
+            heu2_positives, heu2_explored, heu2_eplusd = search.ot_heu_search(g, start, budget, pt_t, pd_t, 2)
+            # print "time", time.time() - start_time
+            heu2_time.append(time.time() - start_time)
+            heu2_positives_t.append(heu2_positives)
+            heu2_explored_t.append(heu2_explored)
+            heu2_eplusd_t.append(heu2_eplusd)
+
+            start_time = time.time()
+            # ideia 3 - ocorrer em pelo menos uma aresta
+            heu3_positives, heu3_explored, heu3_eplusd = search.ot_heu_search(g, start, budget, pt_t, pd_t, 3)
             heu3_time.append(time.time() - start_time)
             heu3_positives_t.append(heu3_positives)
-            heu3_explored_t.append(len(heu3_explored))
+            heu3_explored_t.append(heu3_explored)
+            heu3_eplusd_t.append(heu3_eplusd)
 
-            # start_time = time.time()
-            # mod_positives, mod_explored = search.mod(g, start, budget)        # maximum observed degree (mod)
-            # mod_time.append(time.time() - start_time)
-            # mod_positives_t.append(mod_positives)
-            # mod_explored_t.append(len(mod_explored))
-            i = i + 1
+            start_time = time.time()
+            mod_positives, mod_explored, mod_eplusd = search.mod(g, start, budget)        # maximum observed degree (mod)
+            mod_time.append(time.time() - start_time)
+            mod_positives_t.append(mod_positives)
+            mod_explored_t.append(mod_explored)
+            mod_eplusd_t.append(mod_eplusd)
+
+            j = j + 1
 
         display_save(name, feat_column, "BFS", budget, sum(bfs_time), statistics.mean(bfs_time), statistics.mean(bfs_positives_t),
-            statistics.pstdev(bfs_positives_t), statistics.mean(bfs_explored_t), statistics.pstdev(bfs_explored_t))
-        # display_save(name, feat_column, "DFS", budget, sum(dfs_time), statistics.mean(dfs_time), statistics.mean(dfs_positives_t),
-        #     statistics.pstdev(dfs_positives_t), statistics.mean(dfs_explored_t), statistics.pstdev(dfs_explored_t))
+            statistics.pstdev(bfs_positives_t), statistics.mean(bfs_explored_t), statistics.pstdev(bfs_explored_t),
+            0.0, 0.0)
+
+        display_save(name, feat_column, "DFS", budget, sum(dfs_time), statistics.mean(dfs_time), statistics.mean(dfs_positives_t),
+            statistics.pstdev(dfs_positives_t), statistics.mean(dfs_explored_t), statistics.pstdev(dfs_explored_t),
+            0.0, 0.0)
+
         display_save(name, feat_column, "HEU1", budget, sum(heu1_time), statistics.mean(heu1_time), statistics.mean(heu1_positives_t),
-            statistics.pstdev(heu1_positives_t), statistics.mean(heu1_explored_t), statistics.pstdev(heu1_explored_t))
-        # display_save(name, feat_column, "HEU2", budget, sum(heu2_time), statistics.mean(heu2_time), statistics.mean(heu2_positives_t),
-        #     statistics.pstdev(heu2_positives_t), statistics.mean(heu2_explored_t), statistics.pstdev(heu2_explored_t))
+            statistics.pstdev(heu1_positives_t), statistics.mean(heu1_explored_t), statistics.pstdev(heu1_explored_t),
+            statistics.mean(heu1_eplusd_t), statistics.pstdev(heu1_eplusd_t))
+
+        display_save(name, feat_column, "HEU2", budget, sum(heu2_time), statistics.mean(heu2_time), statistics.mean(heu2_positives_t),
+            statistics.pstdev(heu2_positives_t), statistics.mean(heu2_explored_t), statistics.pstdev(heu2_explored_t),
+            statistics.mean(heu2_eplusd_t), statistics.pstdev(heu2_eplusd_t))
+
         display_save(name, feat_column, "HEU3", budget, sum(heu3_time), statistics.mean(heu3_time), statistics.mean(heu3_positives_t),
-            statistics.pstdev(heu3_positives_t), statistics.mean(heu3_explored_t), statistics.pstdev(heu3_explored_t))
-        # display_save(name, feat_column, "MOD", budget, sum(mod_time), statistics.mean(mod_time), statistics.mean(mod_positives_t),
-        #     statistics.pstdev(mod_positives_t), statistics.mean(mod_explored_t), statistics.pstdev(mod_explored_t))
+            statistics.pstdev(heu3_positives_t), statistics.mean(heu3_explored_t), statistics.pstdev(heu3_explored_t),
+            statistics.mean(heu3_eplusd_t), statistics.pstdev(heu3_eplusd_t))
+
+        display_save(name, feat_column, "MOD", budget, sum(mod_time), statistics.mean(mod_time), statistics.mean(mod_positives_t),
+            statistics.pstdev(mod_positives_t), statistics.mean(mod_explored_t), statistics.pstdev(mod_explored_t),
+            statistics.mean(mod_eplusd_t), statistics.pstdev(mod_eplusd_t))
+
 
 if __name__ == "__main__":
     # 747 vertices, 60050 edges
@@ -231,7 +256,7 @@ if __name__ == "__main__":
     # - pt_t=0.226233043873 pd_t=0.756832601269
     # budget 20 - 340 (20)
     main("snap/facebook/1912", False, "119", 20, 20, 16, 20)
-    # main("snap/facebook/1912", False, "155", 20, 20, 16, 20)          # dispensavel
+    # main("snap/facebook/1912", False, "155", 20, 20, 16, 20)
     # main("snap/facebook/1912", False, "220", 20, 20, 16, 20)
     # main("snap/facebook/1912", False, "219", 20, 20, 16, 20)
 
@@ -245,7 +270,7 @@ if __name__ == "__main__":
     # budget 100 - 2500 (200)
     # main("snap/gplus/116807883656585676940", False, "0", 100, 200, 12, 20)
     # main("snap/gplus/116807883656585676940", False, "1", 100, 200, 12, 20)
-    # main("snap/gplus/116807883656585676940", False, "154", 100, 200, 12, 20)          # dispensavel
+    # main("snap/gplus/116807883656585676940", False, "154", 100, 200, 12, 20)
 
     # 1490 vertices, 19090 edges
     # A - feat 0 (value 1) - 732 positives (49.1275167785 percent) - pt=0.471136720796 pd=0.0884232582504 pn=0.440440020953
@@ -265,7 +290,7 @@ if __name__ == "__main__":
     # budget 10 - 110 (10)
     # main("snap/twitter/256497288", False, "369", 10, 10, 10, 20)
     # main("snap/twitter/256497288", False, "475", 10, 10, 10, 20)
-    # main("snap/twitter/256497288", False, "478", 10, 10, 10, 20)          # dispensavel
+    # main("snap/twitter/256497288", False, "478", 10, 10, 10, 20)
     # main("snap/twitter/256497288", False, "889", 10, 10, 10, 20)
 
     # 105 vertices, 441 edges
