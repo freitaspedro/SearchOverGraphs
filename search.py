@@ -9,6 +9,10 @@ import props
 import math
 import scipy
 
+MapHeu1 ={}
+MapHeu2 ={}
+MapHeu3 = {}
+
 class BFSVisitorBudget(gt.BFSVisitor):
 
     def __init__(self, value, budget):
@@ -52,22 +56,33 @@ def p_t_k(k, kt, kn, pt_t, pd_t):
     end = min(kt, k)
     sum_k = 0
     for i in xrange(ini, end):
-        # sum_k += scipy.special.binom(kt, i) * math.pow(pt_t, i) * math.pow(1-pt_t, kt-i) * scipy.special.binom(kn, k-i) * math.pow(pd_t, k-i) * math.pow(1-pd_t, kn-k+i)
-        sum_k += math.pow(pt_t, i) * math.pow(1-pt_t, kt-i) * math.pow(pd_t, k-i) * math.pow(1-pd_t, kn-k+i)
+        sum_k += scipy.special.binom(kt, i) * math.pow(pt_t, i) * math.pow(1-pt_t, kt-i) * scipy.special.binom(kn, k-i) * math.pow(pd_t, k-i) * math.pow(1-pd_t, kn-k+i)
+        # sum_k += math.pow(pt_t, i) * math.pow(1-pt_t, kt-i) * math.pow(pd_t, k-i) * math.pow(1-pd_t, kn-k+i)
     return sum_k
 
 def heuristic(pt_t, pd_t, kt, kn, mtype):
     if mtype == 1:                  # ideia 1 - ocorrer em todas as arestas
-        return math.pow(pt_t, kt) * math.pow(pd_t, kn)
+        if (kt, kn) in MapHeu1:
+            return MapHeu1[(kt, kn)]
+        pfor = math.pow(pt_t, kt) * math.pow(pd_t, kn)
+        MapHeu1[(kt,kn)] = pfor
+        return pfor
     elif mtype == 2:                # ideia 2 - ocorrer na maioria das arestas
+        if (kt, kn) in MapHeu2:
+            return MapHeu2[(kt, kn)]
         pm = 0
         ini = int(math.ceil((kt+kn)/2.0))
         end = kt+kn
         for i in xrange(ini, end):
             pm += p_t_k(i, kt, kn, pt_t, pd_t)
+        MapHeu2[(kt, kn)] = pm
         return pm
     elif mtype == 3:                # ideia 3 - ocorre em pelo menos uma aresta
-        return 1 - math.pow(1-pt_t, kt) * math.pow(1-pd_t, kn)
+        if (kt, kn) in MapHeu3:
+            return MapHeu3[(kt, kn)]
+        pfra = 1 - math.pow(1-pt_t, kt) * math.pow(1-pd_t, kn)
+        MapHeu3[(kt,kn)] = pfra
+        return pfra
 
 def ot_heu_search(g, start, budget, pt_t, pd_t, mtype):
     for v in g.vertices():

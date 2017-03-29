@@ -3,7 +3,7 @@
 '''
 Esse modulo constroi o grafo com cada vertice contendo uma variavel associada
 indicando a presenca de uma feat passada como parametro. Apos alguns calculos
-pertinentes, sao realizados os diversos tipos de busca (bfs e busca heuristica). Cada
+pertinentes, sao realizados os diversos tipos de busca (bfs, dfs, busca heuristica e mod). Cada
 busca e realizada 'runs' vezes com vertices iniciais aleatorios. Ao fim, e calulada a media e
 desvio padrao dos vertices explorados assim como dos vertices positivos encontrados
 (i.e, vertices com a variavel indicadora igual a 1)
@@ -14,11 +14,11 @@ import pandas
 import props
 import statistics
 import search
-import random
-random.seed(42)
+import numpy as np
 import csv
 import os
 import time
+import pre
 
 def initialize_vertices(g, names, f_values, names_in):
     i = 0
@@ -76,7 +76,7 @@ def display_save(name, feat_column, mtype, budget, sum_time, time, positives_mea
     print "mean positives %s     stdev positives %s" % (positives_mean, positives_stdev)
     print "mean explored %s     stdev explored %s" % (explored_mean, explored_stdev)
     print "mean explored+discovered %s     stdev explored+discovered %s" % (eplusd_mean, eplusd_stdev)
-    '''
+
     filename = name+"_f"+feat_column+"_"+mtype+".search.csv"
     if not os.path.isfile(filename):
         out_csv = csv.writer(open(filename, "wb"))
@@ -87,7 +87,7 @@ def display_save(name, feat_column, mtype, budget, sum_time, time, positives_mea
         out_csv = csv.writer(open(filename, "a"))
         out_csv.writerow([budget, time, positives_mean, positives_stdev, explored_mean, explored_stdev, eplusd_mean, eplusd_stdev])
     print "%s saved" % filename
-    '''
+
 
 def main(name, isdirected, feat_column, initial_budget=0, step_size=0, steps=0, runs=0):
     if feat_column == "-1":             # polblogs, polbooks
@@ -158,8 +158,15 @@ def main(name, isdirected, feat_column, initial_budget=0, step_size=0, steps=0, 
     inn = list(set(glist) - set(out))
     # print "inn", inn
 
+    starts = np.random.choice(inn, 20)  # sorteia aleatoriamento 20 vertices na maior componente conexa
+    # print "starts", starts
+    filename = name+"_f"+feat_column+".starts.txt"
+    np.savetxt(filename, starts, newline=" ")
+    print "%s saved" % filename
+
     for i in xrange(0, steps+1):
         budget = initial_budget+i*step_size
+        # print "budget", budget
         j = 0
         bfs_positives_t, bfs_explored_t, bfs_time = [], [], []
         dfs_positives_t, dfs_explored_t, dfs_time = [], [], []
@@ -168,8 +175,8 @@ def main(name, isdirected, feat_column, initial_budget=0, step_size=0, steps=0, 
         heu3_positives_t, heu3_explored_t, heu3_eplusd_t, heu3_time = [], [], [], []
         mod_positives_t, mod_explored_t, mod_eplusd_t, mod_time = [], [], [], []
         while j < runs:
-            # print "round", i
-            start = g.vertex(random.choice(inn))              # sorteia aleatoriamento um vertice na maior componente conexa
+            # print "round", j
+            start = g.vertex(starts[j])
             # print "start", g.vp.name[start]       # egonets - facebook, gplus, twitter
             # print "start", g.vp.label[start]          # polblogs, polbooks
 
@@ -255,7 +262,7 @@ if __name__ == "__main__":
     # D - feat 219 - 222 positives (29.4039735099) - pt=0.132756036636 pd=0.413189009159 pn=0.454054954205
     # - pt_t=0.226233043873 pd_t=0.756832601269
     # budget 20 - 340 (20)
-    main("snap/facebook/1912", False, "119", 20, 20, 16, 20)
+    # main("snap/facebook/1912", False, "119", 20, 20, 16, 20)
     # main("snap/facebook/1912", False, "155", 20, 20, 16, 20)
     # main("snap/facebook/1912", False, "220", 20, 20, 16, 20)
     # main("snap/facebook/1912", False, "219", 20, 20, 16, 20)
