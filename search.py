@@ -9,8 +9,8 @@ import props
 import math
 import scipy
 
-MapHeu1 ={}
-MapHeu2 ={}
+MapHeu1 = {}
+MapHeu2 = {}
 MapHeu3 = {}
 
 class BFSVisitorBudget(gt.BFSVisitor):
@@ -56,7 +56,8 @@ def p_t_k(k, kt, kn, pt_t, pd_t):
     end = min(kt, k)
     sum_k = 0
     for i in xrange(ini, end):
-        sum_k += scipy.special.binom(kt, i) * math.pow(pt_t, i) * math.pow(1-pt_t, kt-i) * scipy.special.binom(kn, k-i) * math.pow(pd_t, k-i) * math.pow(1-pd_t, kn-k+i)
+        sum_k += scipy.special.binom(kt, i) * math.pow(pt_t, i) * math.pow(1-pt_t, kt-i) * scipy.special.binom(kn, k-i) * math.pow(pd_t, k-i) \
+        * math.pow(1-pd_t, kn-k+i)
         # sum_k += math.pow(pt_t, i) * math.pow(1-pt_t, kt-i) * math.pow(pd_t, k-i) * math.pow(1-pd_t, kn-k+i)
     return sum_k
 
