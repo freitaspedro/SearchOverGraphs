@@ -17,53 +17,59 @@ MapHeu3 = {}
 
 class BFSVisitorBudget(gt.BFSVisitor):
 
-    def __init__(self, value, budget):
+    def __init__(self, value, max_budget, start_time):
         self.value = value
-        self.budget = budget
-        self.visited = 0
-        self.positive_count = 0
+        self.max_budget = max_budget
+        self.start_time = start_time
+        self.explored = 0
+        self.positives = 0
+
+        self.positives_t = [0]*max_budget
+        self.time_t = [0]*max_budget
 
     def examine_vertex(self, u):
-        if self.visited < self.budget:
-            self.visited += 1
+        if self.explored < self.max_budget:
             if int(self.value[u]) == 1:
-                self.positive_count += 1
+                self.positives += 1
+            self.positives_t[self.explored] = self.positives
+            self.time_t[self.explored] = time.time() - self.start_time
+            self.explored += 1
+            # print self.positives_t, self.explored_t, self.time_t
 
 def breadth_first_search(g, start, budgets):
-    bfs_positives, bfs_explored, bfs_time = [0]*len(budgets), [0]*len(budgets), [0]*len(budgets)
-    for i in range(0, len(budgets)):
-        start_time = time.time()
-        visitor = BFSVisitorBudget(g.vp.value, budgets[i])
-        gt.bfs_search(g, start, visitor)
-        bfs_positives[i] = visitor.positive_count
-        bfs_explored[i] = visitor.visited
-        bfs_time[i] = time.time() - start_time
-    return bfs_positives, bfs_explored, bfs_time
+    visitor = BFSVisitorBudget(g.vp.value, budgets[-1], time.time())
+    gt.bfs_search(g, start, visitor)
+    bfs_positives = [visitor.positives_t[i-1] for i in budgets]
+    bfs_time = [visitor.time_t[i-1] for i in budgets]
+    return bfs_positives, bfs_time
 
 class DFSVisitorBudget(gt.DFSVisitor):
 
-    def __init__(self, value, budget):
+    def __init__(self, value, max_budget, start_time):
         self.value = value
-        self.budget = budget
-        self.visited = 0
-        self.positive_count = 0
+        self.max_budget = max_budget
+        self.start_time = start_time
+        self.explored = 0
+        self.positives = 0
+
+        self.positives_t = [0]*max_budget
+        self.time_t = [0]*max_budget
 
     def discover_vertex(self, u):
-        if self.visited < self.budget:
-            self.visited += 1
+        if self.explored < self.max_budget:
             if int(self.value[u]) == 1:
-                self.positive_count += 1
+                self.positives += 1
+            self.positives_t[self.explored] = self.positives
+            self.time_t[self.explored] = time.time() - self.start_time
+            self.explored += 1
+            # print self.positives_t, self.explored_t, self.time_t
 
 def depth_first_search(g, start, budgets):
-    dfs_positives, dfs_explored, dfs_time = [0]*len(budgets), [0]*len(budgets), [0]*len(budgets)
-    for i in range(0, len(budgets)):
-        start_time = time.time()
-        visitor = DFSVisitorBudget(g.vp.value, budgets[i])
-        gt.dfs_search(g, start, visitor)
-        dfs_positives[i] = visitor.positive_count
-        dfs_explored[i] = visitor.visited
-        dfs_time[i] = time.time() - start_time
-    return dfs_positives, dfs_explored, dfs_time
+    visitor = DFSVisitorBudget(g.vp.value, budgets[-1], time.time())
+    gt.dfs_search(g, start, visitor)
+    dfs_positives = [visitor.positives_t[i-1] for i in budgets]
+    dfs_time = [visitor.time_t[i-1] for i in budgets]
+    return dfs_positives, dfs_time
 
 def p_t_k(k, kt, kn, pt_t, pd_t):
     ini = max(0, k-kn)
@@ -99,8 +105,9 @@ def heuristic(pt_t, pd_t, kt, kn, mtype):
         return pfra
 
 def ot_heu_search(g, start, budgets, pt_t, pd_t, mtype):
+    max_budget = budgets[-1]
     start_time = time.time()
-    heu_positives, heu_explored, heu_eplusd, heu_time = [0]*len(budgets), [0]*len(budgets), [0]*len(budgets), [0]*len(budgets)
+    positives_t, eplusd_t, time_t = [0]*max_budget, [0]*max_budget, [0]*max_budget
     for v in g.vertices():
         g.vp.kt[v] = 0
         g.vp.kn[v] = 0
@@ -110,10 +117,9 @@ def ot_heu_search(g, start, budgets, pt_t, pd_t, mtype):
     status = [-1]*num_vertices          # status -1 - desconhecido, status 0 - descoberto, status +1 - explorado
     positives = 0
     status[int(start)] = 1
-    i = 1
-    count = 0
-    # print "max_budget", budgets[-1]
-    while i <= budgets[-1]:
+    i = 0
+    # print "max_budget", max_budget
+    while i < max_budget:
         # print "start", start
         # neighbours = [int(n) for n in start.out_neighbours()]
         # print "neighbours", neighbours
@@ -137,33 +143,31 @@ def ot_heu_search(g, start, budgets, pt_t, pd_t, mtype):
         # print "status 1 -", status.count(1)
         # print "status 0 -", status.count(0)
         # print "status -1 -", status.count(-1)
-        if start is None:
-            print "err: not min_heu"
-            return heu_positives, heu_explored, heu_eplusd, heu_time
         status[start] = 1
-        start = g.vertex(start)
-        if i == budgets[count]:
-            heu_positives[count] = positives
-            heu_explored[count] = i
-            heu_eplusd[count] = i+status.count(0)
-            heu_time[count] = time.time() - start_time
-            count += 1
-            # print "i", i
+        start = g.vertex(start)         # prox vertice a ser explorado
+        positives_t[i] = positives
+        eplusd_t[i] = i+1+status.count(0)
+        time_t[i] = time.time() - start_time
+        # print "i", i
         i += 1
-    return heu_positives, heu_explored, heu_eplusd, heu_time
+    heu_positives = [positives_t[i-1] for i in budgets]
+    heu_eplusd = [eplusd_t[i-1] for i in budgets]
+    heu_time = [time_t[i-1] for i in budgets]
+    return heu_positives, heu_eplusd, heu_time
 
 def mod(g, start, budgets):
+    max_budget = budgets[-1]
     start_time = time.time()
-    mod_positives, mod_explored, mod_eplusd, mod_time = [0]*len(budgets), [0]*len(budgets), [0]*len(budgets), [0]*len(budgets)
+    positives_t, eplusd_t, time_t = [0]*max_budget, [0]*max_budget, [0]*max_budget
+
     num_vertices = g.num_vertices()
     ktv = dict.fromkeys(range(num_vertices), 1)
     kt_values = heap.priority_dict(ktv)
     status = [-1]*num_vertices          # status -1 - desconhecido, status 0 - descoberto, status +1 - explorado
     positives = 0
     status[int(start)] = 1
-    i = 1
-    count = 0
-    while i <= budgets[-1]:
+    i = 0
+    while i < max_budget:
         # print "start", start
         # neighbours = [int(n) for n in start.out_neighbours()]
         # print "neighbours", len(neighbours)
@@ -174,7 +178,7 @@ def mod(g, start, budgets):
                     status[int(n)] = 0
                     kt_values[int(n)] = 0           # inicializa kt com 0 para os vertices descobertos
                 if status[int(n)] == 0:
-                    kt_values[int(n)] += -1
+                    kt_values[int(n)] -= 1
         else:                                       # constata que ele nao tem a caracteristica
             for n in start.out_neighbours():
                 if status[int(n)] == -1:
@@ -185,17 +189,14 @@ def mod(g, start, budgets):
         # print "status 1 -", status.count(1)
         # print "status 0 -", status.count(0)
         # print "status -1 -", status.count(-1)
-        if start is None:
-            print "err: not min_heu"
-            return mod_positives, mod_explored, mod_eplusd, mod_time
         status[start] = 1
         start = g.vertex(start)         # prox vertice a ser explorado
-        if i == budgets[count]:
-            mod_positives[count] = positives
-            mod_explored[count] = i
-            mod_eplusd[count] = i+status.count(0)
-            mod_time[count] = time.time() - start_time
-            count += 1
-            # print "i", i
+        positives_t[i] = positives
+        eplusd_t[i] = i+1+status.count(0)
+        time_t[i] = time.time() - start_time
+        # print "i", i
         i += 1
-    return mod_positives, mod_explored, mod_eplusd, mod_time
+    mod_positives = [positives_t[i-1] for i in budgets]
+    mod_eplusd = [eplusd_t[i-1] for i in budgets]
+    mod_time = [time_t[i-1] for i in budgets]
+    return mod_positives, mod_eplusd, mod_time

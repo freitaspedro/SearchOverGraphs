@@ -67,20 +67,19 @@ def calculate_edges(g):
         pn = pn/float(num_edges)
     return pt, pd, pn
 
-def save(steps, name, feat_column, mtype, budgets, time, positives, explored, eplusd):
+def save(steps, name, feat_column, mtype, budgets, time, positives, eplusd):
     filename = name+"_f"+feat_column+"_"+mtype+".search.csv"
     if not os.path.isfile(filename):
         out_csv = csv.writer(open(filename, "wb"))
-        out_csv.writerow(["budget", "time", "positives_mean", "positives_stdev", "explored_mean", "explored_stdev",
-            "eplusd_mean", "eplusd_stdev"])
+        out_csv.writerow(["budget", "time", "positives_mean", "positives_stdev", "eplusd_mean", "eplusd_stdev"])
         for i in xrange(0, steps+1):
             out_csv.writerow([budgets[i], statistics.mean(time[i]), statistics.mean(positives[i]), statistics.pstdev(positives[i]),
-                statistics.mean(explored[i]), statistics.pstdev(explored[i]), statistics.mean(eplusd[i]), statistics.pstdev(eplusd[i])])
+                statistics.mean(eplusd[i]), statistics.pstdev(eplusd[i])])
     else:
         out_csv = csv.writer(open(filename, "a"))
         for i in xrange(0, steps+1):
             out_csv.writerow([budgets[i], statistics.mean(time[i]), statistics.mean(positives[i]), statistics.pstdev(positives[i]),
-                statistics.mean(explored[i]), statistics.pstdev(explored[i]), statistics.mean(eplusd[i]), statistics.pstdev(eplusd[i])])
+                statistics.mean(eplusd[i]), statistics.pstdev(eplusd[i])])
     print "%s saved" % filename
 
 def main(name, isdirected, feat_column, initial_budget=0, step_size=0, steps=0, runs=0):
@@ -164,18 +163,18 @@ def main(name, isdirected, feat_column, initial_budget=0, step_size=0, steps=0, 
         budgets[i] = initial_budget+i*step_size
     # print "budgets", budgets
 
-    bfs_positives_t, bfs_explored_t, bfs_eplusd_t, bfs_time_t = [[0]*runs for count in range(steps+1)], \
-    [[0]*runs for count in range(steps+1)], [[0]*runs for count in range(steps+1)], [[0]*runs for count in range(steps+1)]
-    dfs_positives_t, dfs_explored_t, dfs_eplusd_t, dfs_time_t = [[0]*runs for count in range(steps+1)], \
-    [[0]*runs for count in range(steps+1)], [[0]*runs for count in range(steps+1)], [[0]*runs for count in range(steps+1)]
-    heu1_positives_t, heu1_explored_t, heu1_eplusd_t, heu1_time_t = [[0]*runs for count in range(steps+1)], \
-    [[0]*runs for count in range(steps+1)], [[0]*runs for count in range(steps+1)], [[0]*runs for count in range(steps+1)]
-    heu2_positives_t, heu2_explored_t, heu2_eplusd_t, heu2_time_t = [[0]*runs for count in range(steps+1)], \
-    [[0]*runs for count in range(steps+1)], [[0]*runs for count in range(steps+1)], [[0]*runs for count in range(steps+1)]
-    heu3_positives_t, heu3_explored_t, heu3_eplusd_t, heu3_time_t = [[0]*runs for count in range(steps+1)], \
-    [[0]*runs for count in range(steps+1)], [[0]*runs for count in range(steps+1)], [[0]*runs for count in range(steps+1)]
-    mod_positives_t, mod_explored_t, mod_eplusd_t, mod_time_t = [[0]*runs for count in range(steps+1)], \
-    [[0]*runs for count in range(steps+1)], [[0]*runs for count in range(steps+1)], [[0]*runs for count in range(steps+1)]
+    bfs_positives_t, bfs_eplusd_t, bfs_time_t = [[0]*runs for count in range(steps+1)], [[0]*runs for count in range(steps+1)], \
+    [[0]*runs for count in range(steps+1)]
+    dfs_positives_t, dfs_eplusd_t, dfs_time_t = [[0]*runs for count in range(steps+1)], [[0]*runs for count in range(steps+1)], \
+    [[0]*runs for count in range(steps+1)]
+    heu1_positives_t, heu1_eplusd_t, heu1_time_t = [[0]*runs for count in range(steps+1)], [[0]*runs for count in range(steps+1)], \
+    [[0]*runs for count in range(steps+1)]
+    heu2_positives_t, heu2_eplusd_t, heu2_time_t = [[0]*runs for count in range(steps+1)], [[0]*runs for count in range(steps+1)], \
+    [[0]*runs for count in range(steps+1)]
+    heu3_positives_t, heu3_eplusd_t, heu3_time_t = [[0]*runs for count in range(steps+1)], [[0]*runs for count in range(steps+1)], \
+    [[0]*runs for count in range(steps+1)]
+    mod_positives_t, mod_eplusd_t, mod_time_t = [[0]*runs for count in range(steps+1)], [[0]*runs for count in range(steps+1)], \
+    [[0]*runs for count in range(steps+1)]
 
     j = 0
     while j < runs:
@@ -185,57 +184,51 @@ def main(name, isdirected, feat_column, initial_budget=0, step_size=0, steps=0, 
         # print "start", g.vp.name[start]       # egonets - facebook, gplus, twitter
         # print "start", g.vp.label[start]          # polblogs, polbooks
 
-        bfs_positives, bfs_explored, bfs_time = search2.breadth_first_search(g, start, budgets)         # breadth first search (BFS)
+        bfs_positives, bfs_time = search2.breadth_first_search(g, start, budgets)         # breadth first search (BFS)
         for k in xrange(0, steps+1):
             bfs_positives_t[k][j] = bfs_positives[k]
-            bfs_explored_t[k][j] = bfs_explored[k]
             bfs_time_t[k][j] = bfs_time[k]
 
-        dfs_positives, dfs_explored, dfs_time = search2.depth_first_search(g, start, budgets)           # depth first search (DFS)
+        dfs_positives, dfs_time = search2.depth_first_search(g, start, budgets)           # depth first search (DFS)
         for k in xrange(0, steps+1):
             dfs_positives_t[k][j] = dfs_positives[k]
-            dfs_explored_t[k][j] = dfs_explored[k]
             dfs_time_t[k][j] = dfs_time[k]
 
         # ideia 1 - ocorrer em todas as arestas
-        heu1_positives, heu1_explored, heu1_eplusd, heu1_time = search2.ot_heu_search(g, start, budgets, pt_t, pd_t, 1)
+        heu1_positives, heu1_eplusd, heu1_time = search2.ot_heu_search(g, start, budgets, pt_t, pd_t, 1)
         for k in xrange(0, steps+1):
             heu1_positives_t[k][j] = heu1_positives[k]
-            heu1_explored_t[k][j] = heu1_explored[k]
             heu1_eplusd_t[k][j] = heu1_eplusd[k]
             heu1_time_t[k][j] = heu1_time[k]
 
         # ideia 2 - ocorrer na maioria das arestas
-        heu2_positives, heu2_explored, heu2_eplusd, heu2_time = search2.ot_heu_search(g, start, budgets, pt_t, pd_t, 2)
+        heu2_positives, heu2_eplusd, heu2_time = search2.ot_heu_search(g, start, budgets, pt_t, pd_t, 2)
         for k in xrange(0, steps+1):
             heu2_positives_t[k][j] = heu2_positives[k]
-            heu2_explored_t[k][j] = heu2_explored[k]
             heu2_eplusd_t[k][j] = heu2_eplusd[k]
             heu2_time_t[k][j] = heu2_time[k]
 
         # ideia 3 - ocorrer em pelo menos uma aresta
-        heu3_positives, heu3_explored, heu3_eplusd, heu3_time = search2.ot_heu_search(g, start, budgets, pt_t, pd_t, 3)
+        heu3_positives, heu3_eplusd, heu3_time = search2.ot_heu_search(g, start, budgets, pt_t, pd_t, 3)
         for k in xrange(0, steps+1):
             heu3_positives_t[k][j] = heu3_positives[k]
-            heu3_explored_t[k][j] = heu3_explored[k]
             heu3_eplusd_t[k][j] = heu3_eplusd[k]
             heu3_time_t[k][j] = heu3_time[k]
 
         # maximum observed degree (mod adaptado)
-        mod_positives, mod_explored, mod_eplusd, mod_time = search2.mod(g, start, budgets)
+        mod_positives, mod_eplusd, mod_time = search2.mod(g, start, budgets)
         for k in xrange(0, steps+1):
             mod_positives_t[k][j] = mod_positives[k]
-            mod_explored_t[k][j] = mod_explored[k]
             mod_eplusd_t[k][j] = mod_eplusd[k]
             mod_time_t[k][j] = mod_time[k]
         j += 1
 
-    save(steps, name, feat_column, "BFS", budgets, bfs_time_t, bfs_positives_t, bfs_explored_t, bfs_eplusd_t)
-    save(steps, name, feat_column, "DFS", budgets, dfs_time_t, dfs_positives_t, dfs_explored_t, dfs_eplusd_t)
-    save(steps, name, feat_column, "HEU1", budgets, heu1_time_t, heu1_positives_t, heu1_explored_t, heu1_eplusd_t)
-    save(steps, name, feat_column, "HEU2", budgets, heu2_time_t, heu2_positives_t, heu2_explored_t, heu2_eplusd_t)
-    save(steps, name, feat_column, "HEU3", budgets, heu3_time_t, heu3_positives_t, heu3_explored_t, heu3_eplusd_t)
-    save(steps, name, feat_column, "MODs", budgets, mod_time_t, mod_positives_t, mod_explored_t, mod_eplusd_t)
+    save(steps, name, feat_column, "BFS", budgets, bfs_time_t, bfs_positives_t, bfs_eplusd_t)
+    save(steps, name, feat_column, "DFS", budgets, dfs_time_t, dfs_positives_t, dfs_eplusd_t)
+    save(steps, name, feat_column, "HEU1", budgets, heu1_time_t, heu1_positives_t, heu1_eplusd_t)
+    save(steps, name, feat_column, "HEU2", budgets, heu2_time_t, heu2_positives_t, heu2_eplusd_t)
+    save(steps, name, feat_column, "HEU3", budgets, heu3_time_t, heu3_positives_t, heu3_eplusd_t)
+    save(steps, name, feat_column, "MODs", budgets, mod_time_t, mod_positives_t, mod_eplusd_t)
 
 
 
@@ -250,7 +243,7 @@ if __name__ == "__main__":
     # D - feat 219 - 222 positives (29.4039735099) - pt: 0.132756036636 pd: 0.413189009159 pn: 0.454054954205
     # - pt_t: 0.226233043873 pd_t: 0.756832601269
     # budget 20 - 340 (20)
-    # main("snap/facebook/1912", False, "119", 20, 20, 16, 20)
+    main("snap/facebook/1912", False, "119", 20, 20, 16, 20)
     # main("snap/facebook/1912", False, "155", 20, 20, 16, 20)
     # main("snap/facebook/1912", False, "220", 20, 20, 16, 20)
     # main("snap/facebook/1912", False, "219", 20, 20, 16, 20)
@@ -321,7 +314,7 @@ if __name__ == "__main__":
     # feat 0 (value 0) - 758 positives (50.8724832215 percent) - pt: 0.440440020953 pd: 0.0884232582504 pn: 0.471136720796
     # pt_t: 0.483162854844 pd_t: 0.167194928685
     # budget 50 - 750 (50)
-    main("uci/polblogs/polblogs.gml", False, "-1", 50, 50, 14, 20)
+    # main("uci/polblogs/polblogs.gml", False, "-1", 50, 50, 14, 20)
 
     ###########################################################################
 

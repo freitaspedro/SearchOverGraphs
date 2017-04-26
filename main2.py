@@ -67,30 +67,23 @@ def calculate_edges(g):
         pn = pn/float(num_edges)
     return pt, pd, pn
 
-def save(steps, name, feat_column, mtype, budgets, sum_time, time, positives_mean, positives_stdev, explored_mean,
-    explored_stdev, eplusd_mean, eplusd_stdev):
+def save(steps, name, feat_column, mtype, budgets, sum_time, time, positives_mean, positives_stdev, eplusd_mean, eplusd_stdev):
     filename = name+"_f"+feat_column+"_"+mtype+".search.csv"
     if not os.path.isfile(filename):
         out_csv = csv.writer(open(filename, "wb"))
-        out_csv.writerow(["budget", "time", "positives_mean", "positives_stdev", "explored_mean", "explored_stdev",
-            "eplusd_mean", "eplusd_stdev"])
+        out_csv.writerow(["budget", "time", "positives_mean", "positives_stdev", "eplusd_mean", "eplusd_stdev"])
         for i in xrange(0, steps+1):
-            out_csv.writerow([budgets[i], time[i], positives_mean[i], positives_stdev[i], explored_mean[i], explored_stdev[i], eplusd_mean[i],
-                eplusd_stdev[i]])
+            out_csv.writerow([budgets[i], time[i], positives_mean[i], positives_stdev[i], eplusd_mean[i], eplusd_stdev[i]])
     else:
         out_csv = csv.writer(open(filename, "a"))
         for i in xrange(0, steps+1):
-            out_csv.writerow([budgets[i], time[i], positives_mean[i], positives_stdev[i], explored_mean[i], explored_stdev[i], eplusd_mean[i],
-                eplusd_stdev[i]])
+            out_csv.writerow([budgets[i], time[i], positives_mean[i], positives_stdev[i], eplusd_mean[i], eplusd_stdev[i]])
     print "%s saved" % filename
 
-def update_budgets(runs, steps, positives, explored, eplusd, time, positives_mean, positives_stdev, explored_mean, explored_stdev,
-    eplusd_mean, eplusd_stdev, sum_time, time_mean):
+def update_budgets(runs, steps, positives, eplusd, time, positives_mean, positives_stdev, eplusd_mean, eplusd_stdev, sum_time, time_mean):
     for i in xrange(0, steps+1):
         positives_mean[i] += positives[i]/float(runs)
         # positives_stdev[i] =
-        explored_mean[i] += explored[i]/float(runs)
-        # explored_stdev[i] =
         if eplusd > 0:
             eplusd_mean[i] += eplusd[i]/float(runs)
         # eplusd_stdev[i] =
@@ -178,27 +171,18 @@ def main(name, isdirected, feat_column, initial_budget=0, step_size=0, steps=0, 
         budgets[i] = initial_budget+i*step_size
     # print "budgets", budgets
 
-    mean_bfs_positives, stdev_bfs_positives, mean_bfs_explored, stdev_bfs_explored, sum_bfs_time, mean_bfs_time, mean_bfs_eplusd, \
-    stdev_bfs_eplusd = [0]*(steps+1), [0]*(steps+1), [0]*(steps+1), [0]*(steps+1), [0]*(steps+1), [0]*(steps+1), [0]*(steps+1), [0]*(steps+1)
-
-    mean_dfs_positives, stdev_dfs_positives, mean_dfs_explored, stdev_dfs_explored, sum_dfs_time, mean_dfs_time, mean_dfs_eplusd, \
-    stdev_dfs_eplusd = [0]*(steps+1), [0]*(steps+1), [0]*(steps+1), [0]*(steps+1), [0]*(steps+1), [0]*(steps+1), [0]*(steps+1), [0]*(steps+1)
-
-    mean_heu1_positives, stdev_heu1_positives, mean_heu1_explored, stdev_heu1_explored, mean_heu1_eplusd, stdev_heu1_eplusd, \
-    sum_heu1_time, mean_heu1_time = [0]*(steps+1), [0]*(steps+1), [0]*(steps+1), [0]*(steps+1), [0]*(steps+1), [0]*(steps+1), \
-    [0]*(steps+1), [0]*(steps+1)
-
-    mean_heu2_positives, stdev_heu2_positives, mean_heu2_explored, stdev_heu2_explored, mean_heu2_eplusd, stdev_heu2_eplusd, \
-    sum_heu2_time, mean_heu2_time = [0]*(steps+1), [0]*(steps+1), [0]*(steps+1), [0]*(steps+1), [0]*(steps+1), [0]*(steps+1), \
-    [0]*(steps+1), [0]*(steps+1)
-
-    mean_heu3_positives, stdev_heu3_positives, mean_heu3_explored, stdev_heu3_explored, mean_heu3_eplusd, stdev_heu3_eplusd, \
-    sum_heu3_time, mean_heu3_time = [0]*(steps+1), [0]*(steps+1), [0]*(steps+1), [0]*(steps+1), [0]*(steps+1), [0]*(steps+1), \
-    [0]*(steps+1), [0]*(steps+1)
-
-    mean_mod_positives, stdev_mod_positives, mean_mod_explored, stdev_mod_explored, mean_mod_eplusd, stdev_mod_eplusd, \
-    sum_mod_time, mean_mod_time = [0]*(steps+1), [0]*(steps+1), [0]*(steps+1), [0]*(steps+1), [0]*(steps+1), [0]*(steps+1), \
-    [0]*(steps+1), [0]*(steps+1)
+    mean_bfs_positives, stdev_bfs_positives, mean_bfs_eplusd, stdev_bfs_eplusd, sum_bfs_time, mean_bfs_time = \
+    [0]*(steps+1), [0]*(steps+1), [0]*(steps+1), [0]*(steps+1), [0]*(steps+1), [0]*(steps+1)
+    mean_dfs_positives, stdev_dfs_positives, mean_dfs_eplusd, stdev_dfs_eplusd, sum_dfs_time, mean_dfs_time = \
+    [0]*(steps+1), [0]*(steps+1), [0]*(steps+1), [0]*(steps+1), [0]*(steps+1), [0]*(steps+1)
+    mean_heu1_positives, stdev_heu1_positives, mean_heu1_eplusd, stdev_heu1_eplusd, sum_heu1_time, mean_heu1_time = \
+    [0]*(steps+1), [0]*(steps+1), [0]*(steps+1), [0]*(steps+1), [0]*(steps+1), [0]*(steps+1)
+    mean_heu2_positives, stdev_heu2_positives, mean_heu2_eplusd, stdev_heu2_eplusd, sum_heu2_time, mean_heu2_time = \
+    [0]*(steps+1), [0]*(steps+1), [0]*(steps+1), [0]*(steps+1), [0]*(steps+1), [0]*(steps+1)
+    mean_heu3_positives, stdev_heu3_positives, mean_heu3_eplusd, stdev_heu3_eplusd, sum_heu3_time, mean_heu3_time = \
+    [0]*(steps+1), [0]*(steps+1), [0]*(steps+1), [0]*(steps+1), [0]*(steps+1), [0]*(steps+1)
+    mean_mod_positives, stdev_mod_positives, mean_mod_eplusd, stdev_mod_eplusd, sum_mod_time, mean_mod_time = \
+    [0]*(steps+1), [0]*(steps+1), [0]*(steps+1), [0]*(steps+1), [0]*(steps+1), [0]*(steps+1)
 
     j = 0
     while j < runs:
@@ -208,47 +192,47 @@ def main(name, isdirected, feat_column, initial_budget=0, step_size=0, steps=0, 
         # print "start", g.vp.name[start]       # egonets - facebook, gplus, twitter
         # print "start", g.vp.label[start]          # polblogs, polbooks
 
-        bfs_positives, bfs_explored, bfs_time = search2.breadth_first_search(g, start, budgets)         # breadth first search (BFS)
-        update_budgets(runs, steps, bfs_positives, bfs_explored, 0, bfs_time, mean_bfs_positives, stdev_bfs_positives,
-            mean_bfs_explored, stdev_bfs_explored, None, None, sum_bfs_time, mean_bfs_time)
+        bfs_positives, bfs_time = search2.breadth_first_search(g, start, budgets)         # breadth first search (BFS)
+        update_budgets(runs, steps, bfs_positives, 0, bfs_time, mean_bfs_positives, stdev_bfs_positives,
+            mean_bfs_eplusd, stdev_bfs_eplusd, sum_bfs_time, mean_bfs_time)
 
-        dfs_positives, dfs_explored_t, dfs_time = search2.depth_first_search(g, start, budgets)           # depth first search (DFS)
-        update_budgets(runs, steps, dfs_positives, dfs_explored_t, 0, dfs_time, mean_dfs_positives, stdev_dfs_positives,
-            mean_dfs_explored, stdev_dfs_explored, None, None, sum_dfs_time, mean_dfs_time)
+        dfs_positives, dfs_time = search2.depth_first_search(g, start, budgets)           # depth first search (DFS)
+        update_budgets(runs, steps, dfs_positives, 0, dfs_time, mean_dfs_positives, stdev_dfs_positives,
+            mean_heu1_eplusd, stdev_heu1_eplusd, sum_dfs_time, mean_dfs_time)
 
         # ideia 1 - ocorrer em todas as arestas
-        heu1_positives, heu1_explored, heu1_eplusd, heu1_time = search2.ot_heu_search(g, start, budgets, pt_t, pd_t, 1)
-        update_budgets(runs, steps, heu1_positives, heu1_explored, heu1_eplusd, heu1_time, mean_heu1_positives, stdev_heu1_positives,
-            mean_heu1_explored, stdev_heu1_explored, mean_heu1_eplusd, stdev_heu1_eplusd, sum_heu1_time, mean_heu1_time)
+        heu1_positives, heu1_eplusd, heu1_time = search2.ot_heu_search(g, start, budgets, pt_t, pd_t, 1)
+        update_budgets(runs, steps, heu1_positives, heu1_eplusd, heu1_time, mean_heu1_positives, stdev_heu1_positives,
+            mean_heu1_eplusd, stdev_heu1_eplusd, sum_heu1_time, mean_heu1_time)
 
         # ideia 2 - ocorrer na maioria das arestas
-        heu2_positives, heu2_explored, heu2_eplusd, heu2_time = search2.ot_heu_search(g, start, budgets, pt_t, pd_t, 2)
-        update_budgets(runs, steps, heu2_positives, heu2_explored, heu2_eplusd, heu2_time, mean_heu2_positives, stdev_heu2_positives,
-            mean_heu2_explored, stdev_heu2_explored, mean_heu2_eplusd, stdev_heu2_eplusd, sum_heu2_time, mean_heu2_time)
+        heu2_positives, heu2_eplusd, heu2_time = search2.ot_heu_search(g, start, budgets, pt_t, pd_t, 2)
+        update_budgets(runs, steps, heu2_positives, heu2_eplusd, heu2_time, mean_heu2_positives, stdev_heu2_positives,
+            mean_heu2_eplusd, stdev_heu2_eplusd, sum_heu2_time, mean_heu2_time)
 
         # ideia 3 - ocorrer em pelo menos uma aresta
-        heu3_positives, heu3_explored, heu3_eplusd, heu3_time = search2.ot_heu_search(g, start, budgets, pt_t, pd_t, 3)
-        update_budgets(runs, steps, heu3_positives, heu3_explored, heu3_eplusd, heu3_time, mean_heu3_positives, stdev_heu3_positives,
-            mean_heu3_explored, stdev_heu3_explored, mean_heu3_eplusd, stdev_heu3_eplusd, sum_heu3_time, mean_heu3_time)
+        heu3_positives, heu3_eplusd, heu3_time = search2.ot_heu_search(g, start, budgets, pt_t, pd_t, 3)
+        update_budgets(runs, steps, heu3_positives, heu3_eplusd, heu3_time, mean_heu3_positives, stdev_heu3_positives,
+            mean_heu3_eplusd, stdev_heu3_eplusd, sum_heu3_time, mean_heu3_time)
 
         # maximum observed degree (mod adaptado)
-        mod_positives, mod_explored, mod_eplusd, mod_time = search2.mod(g, start, budgets)
-        update_budgets(runs, steps, mod_positives, mod_explored, mod_eplusd, mod_time, mean_mod_positives, stdev_mod_positives,
-            mean_mod_explored, stdev_mod_explored, mean_mod_eplusd, stdev_mod_eplusd, sum_mod_time, mean_mod_time)
+        mod_positives, mod_eplusd, mod_time = search2.mod(g, start, budgets)
+        update_budgets(runs, steps, mod_positives, mod_eplusd, mod_time, mean_mod_positives, stdev_mod_positives,
+            mean_mod_eplusd, stdev_mod_eplusd, sum_mod_time, mean_mod_time)
         j += 1
 
-    save(steps, name, feat_column, "BFS", budgets, sum_bfs_time, mean_bfs_time, mean_bfs_positives, stdev_bfs_positives, mean_bfs_explored,
-        stdev_bfs_explored, mean_bfs_eplusd, stdev_bfs_eplusd)
-    save(steps, name, feat_column, "DFS", budgets, sum_dfs_time, mean_dfs_time, mean_dfs_positives, stdev_dfs_positives, mean_dfs_explored,
-        stdev_dfs_explored, mean_dfs_eplusd, stdev_dfs_eplusd)
+    save(steps, name, feat_column, "BFS", budgets, sum_bfs_time, mean_bfs_time, mean_bfs_positives, stdev_bfs_positives,
+        mean_bfs_eplusd, stdev_bfs_eplusd)
+    save(steps, name, feat_column, "DFS", budgets, sum_dfs_time, mean_dfs_time, mean_dfs_positives, stdev_dfs_positives,
+        mean_dfs_eplusd, stdev_dfs_eplusd)
     save(steps, name, feat_column, "HEU1", budgets, sum_heu1_time, mean_heu1_time, mean_heu1_positives, stdev_heu1_positives,
-        mean_heu1_explored, stdev_heu1_explored, mean_heu1_eplusd, stdev_heu1_eplusd)
+        mean_heu1_eplusd, stdev_heu1_eplusd)
     save(steps, name, feat_column, "HEU2", budgets, sum_heu2_time, mean_heu2_time, mean_heu2_positives, stdev_heu2_positives,
-        mean_heu2_explored, stdev_heu2_explored, mean_heu2_eplusd, stdev_heu2_eplusd)
+        mean_heu2_eplusd, stdev_heu2_eplusd)
     save(steps, name, feat_column, "HEU3", budgets, sum_heu3_time, mean_heu3_time, mean_heu3_positives, stdev_heu3_positives,
-        mean_heu3_explored, stdev_heu3_explored, mean_heu3_eplusd, stdev_heu3_eplusd)
+        mean_heu3_eplusd, stdev_heu3_eplusd)
     save(steps, name, feat_column, "MODs", budgets, sum_mod_time, mean_mod_time, mean_mod_positives, stdev_mod_positives,
-        mean_mod_explored, stdev_mod_explored, mean_mod_eplusd, stdev_mod_eplusd)
+        mean_mod_eplusd, stdev_mod_eplusd)
 
 
 
@@ -263,7 +247,7 @@ if __name__ == "__main__":
     # D - feat 219 - 222 positives (29.4039735099) - pt: 0.132756036636 pd: 0.413189009159 pn: 0.454054954205
     # - pt_t: 0.226233043873 pd_t: 0.756832601269
     # budget 20 - 340 (20)
-    # main("snap/facebook/1912", False, "119", 20, 20, 16, 20)
+    main("snap/facebook/1912", False, "119", 20, 20, 16, 20)
     # main("snap/facebook/1912", False, "155", 20, 20, 16, 20)
     # main("snap/facebook/1912", False, "220", 20, 20, 16, 20)
     # main("snap/facebook/1912", False, "219", 20, 20, 16, 20)
@@ -334,7 +318,7 @@ if __name__ == "__main__":
     # feat 0 (value 0) - 758 positives (50.8724832215 percent) - pt: 0.440440020953 pd: 0.0884232582504 pn: 0.471136720796
     # pt_t: 0.483162854844 pd_t: 0.167194928685
     # budget 50 - 750 (50)
-    main("uci/polblogs/polblogs.gml", False, "-1", 50, 50, 14, 20)
+    # main("uci/polblogs/polblogs.gml", False, "-1", 50, 50, 14, 20)
 
     ###########################################################################
 
