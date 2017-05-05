@@ -34,7 +34,7 @@ class BFSVisitorBudget(gt.BFSVisitor):
             self.positives_t[self.explored] = self.positives
             self.time_t[self.explored] = time.time() - self.start_time
             self.explored += 1
-            # print self.positives_t, self.explored_t, self.time_t
+            # print self.positives_t, self.time_t
 
 def breadth_first_search(g, start, budgets):
     visitor = BFSVisitorBudget(g.vp.value, budgets[-1], time.time())
@@ -62,7 +62,7 @@ class DFSVisitorBudget(gt.DFSVisitor):
             self.positives_t[self.explored] = self.positives
             self.time_t[self.explored] = time.time() - self.start_time
             self.explored += 1
-            # print self.positives_t, self.explored_t, self.time_t
+            # print self.positives_t, self.time_t
 
 def depth_first_search(g, start, budgets):
     visitor = DFSVisitorBudget(g.vp.value, budgets[-1], time.time())
@@ -108,12 +108,15 @@ def ot_heu_search(g, start, budgets, pt_t, pd_t, mtype):
     max_budget = budgets[-1]
     start_time = time.time()
     positives_t, eplusd_t, time_t = [0]*max_budget, [0]*max_budget, [0]*max_budget
-    for v in g.vertices():
-        g.vp.kt[v] = 0
-        g.vp.kn[v] = 0
+    # for v in g.vertices():
+    #     g.vp.kt[v] = 0
+    #     g.vp.kn[v] = 0
     num_vertices = g.num_vertices()
-    hv = dict.fromkeys(range(num_vertices), 0)
-    heu_values = heap.priority_dict(hv)
+    kt_values = [0]*num_vertices
+    kn_values = [0]*num_vertices
+    # hv = dict.fromkeys(range(num_vertices), 0)
+    # heu_values = heap.priority_dict(hv)
+    heu_values = {}
     status = [-1]*num_vertices          # status -1 - desconhecido, status 0 - descoberto, status +1 - explorado
     positives = 0
     status[int(start)] = 1
@@ -126,27 +129,36 @@ def ot_heu_search(g, start, budgets, pt_t, pd_t, mtype):
         if int(g.vp.value[start]) == 1:          # ao explorar o vertice constata que ele tem a caracteristica
             positives += 1
             for n in start.out_neighbours():
-                if status[int(n)] == -1:            # vertice desconhecido passa a descoberto
-                    status[int(n)] = 0
-                if status[int(n)] == 0:     # incrementa kt e calcula heuristica para descobertos
-                    g.vp.kt[n] += 1
-                    heu_values[int(n)] = heuristic(pt_t, pd_t, g.vp.kt[n], g.vp.kn[n], mtype) * -1
+                index = int(n)
+                if status[index] == -1:            # vertice desconhecido passa a descoberto
+                    status[index] = 0
+                if status[index] == 0:     # incrementa kt e calcula heuristica para descobertos
+                    # g.vp.kt[n] += 1
+                    kt_values[index] += 1
+                    # heu_values[index] = heuristic(pt_t, pd_t, g.vp.kt[n], g.vp.kn[n], mtype) * -1
+                    heu_values[index] = heuristic(pt_t, pd_t, kt_values[index], kn_values[index], mtype)
         else:                                       # constata que ele nao tem a caracteristica
             for n in start.out_neighbours():
-                if status[int(n)] == -1:
-                    status[int(n)] = 0
-                if status[int(n)] == 0:
-                    g.vp.kn[n] += 1
-                    heu_values[int(n)] = heuristic(pt_t, pd_t, g.vp.kt[n], g.vp.kn[n], mtype) * -1
+                index = int(n)
+                if status[index] == -1:
+                    status[index] = 0
+                if status[index] == 0:
+                    # g.vp.kn[n] += 1
+                    kn_values[index] += 1
+                    # heu_values[int(n)] = heuristic(pt_t, pd_t, g.vp.kt[n], g.vp.kn[n], mtype) * -1
+                    heu_values[index] = heuristic(pt_t, pd_t, kt_values[index], kn_values[index], mtype)
         # print "heu_values", heu_values
-        start = heu_values.pop_smallest()
+        # start = heu_values.pop_smallest()
+        start = max(heu_values, key=lambda i: heu_values[i])
+        del heu_values[start]
         # print "status 1 -", status.count(1)
         # print "status 0 -", status.count(0)
         # print "status -1 -", status.count(-1)
         status[start] = 1
         start = g.vertex(start)         # prox vertice a ser explorado
         positives_t[i] = positives
-        eplusd_t[i] = i+1+status.count(0)
+        # eplusd_t[i] = i+1+status.count(0)
+        eplusd_t[i] = i+1
         time_t[i] = time.time() - start_time
         # print "i", i
         i += 1
@@ -162,7 +174,8 @@ def mod(g, start, budgets):
 
     num_vertices = g.num_vertices()
     ktv = dict.fromkeys(range(num_vertices), 1)
-    kt_values = heap.priority_dict(ktv)
+    # kt_values = heap.priority_dict(ktv)
+    kt_values = {}
     status = [-1]*num_vertices          # status -1 - desconhecido, status 0 - descoberto, status +1 - explorado
     positives = 0
     status[int(start)] = 1
@@ -174,25 +187,31 @@ def mod(g, start, budgets):
         if int(g.vp.value[start]) == 1:          # ao explorar o vertice constata que ele tem a caracteristica
             positives += 1
             for n in start.out_neighbours():
-                if status[int(n)] == -1:
-                    status[int(n)] = 0
-                    kt_values[int(n)] = 0           # inicializa kt com 0 para os vertices descobertos
-                if status[int(n)] == 0:
-                    kt_values[int(n)] -= 1
+                index = int(n)
+                if status[index] == -1:
+                    status[index] = 0
+                    kt_values[index] = 0           # inicializa kt com 0 para os vertices descobertos
+                if status[index] == 0:
+                    # kt_values[index] -= 1
+                    kt_values[index] += 1
         else:                                       # constata que ele nao tem a caracteristica
             for n in start.out_neighbours():
-                if status[int(n)] == -1:
-                    status[int(n)] = 0
-                    kt_values[int(n)] = 0
-       # print "kt_values", kt_values
-        start = kt_values.pop_smallest()
+                index = int(n)
+                if status[index] == -1:
+                    status[index] = 0
+                    kt_values[index] = 0
+        # print "kt_values", kt_values
+        # start = kt_values.pop_smallest()
+        start = max(kt_values, key=lambda i: kt_values[i])
+        del kt_values[start]
         # print "status 1 -", status.count(1)
         # print "status 0 -", status.count(0)
         # print "status -1 -", status.count(-1)
         status[start] = 1
         start = g.vertex(start)         # prox vertice a ser explorado
         positives_t[i] = positives
-        eplusd_t[i] = i+1+status.count(0)
+        # eplusd_t[i] = i+1+status.count(0)
+        eplusd_t[i] = i+1
         time_t[i] = time.time() - start_time
         # print "i", i
         i += 1

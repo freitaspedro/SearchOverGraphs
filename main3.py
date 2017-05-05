@@ -18,54 +18,7 @@ import numpy as np
 import csv
 import os
 import pre
-
-def initialize_vertices(g, names, f_values, names_in):
-    i = 0
-    cont = 0
-    for curr_name in names:                 # atualiza os vertices com os valores da feat
-        if curr_name in names_in:                   # se o vertice tiver em feat.csv e edges.csv
-            v = gt.find_vertex(g, g.vp.name, curr_name)
-            v = int(v[0])
-            g.vp.value[v] = f_values[i]
-            g.vp.kt[v] = 0
-            g.vp.kn[v] = 0
-            cont = cont + 1
-        i = i + 1
-    # v1= gt.find_vertex(g,  g.vp.name, "1917")
-    # print "id 1917 - feat_value %s" % g.vp.value[int(v1[0])]      # id 1917 - feat_value 1
-    # v2= gt.find_vertex(g,  g.vp.name, "2428")
-    # print "id 2428 - feat_value  %s" % g.vp.value[int(v2[0])]     # id 2428 - feat_value 0
-    return cont
-
-def initialize_vertices_0(g, rest):
-    for name in rest:
-        v = gt.find_vertex(g, g.vp.name, str(name))
-        v = int(v[0])
-        g.vp.value[v] = 0
-        g.vp.kt[v] = 0
-        g.vp.kn[v] = 0
-
-def calculate_edges(g):
-    pt = 0.0
-    pd = 0.0
-    pn = 0.0
-    for e in g.edges():
-        src = e.source()
-        tgt = e.target()
-        if g.vp.value[src] != g.vp.value[tgt]:
-            pd = pd + 1
-        elif int(g.vp.value[src]) == 0 and int(g.vp.value[tgt]) == 0:
-            pn = pn + 1
-        else:
-            pt = pt + 1
-    num_edges = g.num_edges()
-    if (pt+pd+pn) != num_edges:
-        print "err in calculate pt, pd and pn"
-    else:
-        pt = pt/float(num_edges)
-        pd = pd/float(num_edges)
-        pn = pn/float(num_edges)
-    return pt, pd, pn
+import main
 
 def save(steps, name, feat_column, mtype, budgets, time, positives, eplusd):
     filename = name+"_f"+feat_column+"_"+mtype+".search.csv"
@@ -87,10 +40,10 @@ def main(name, isdirected, feat_column, initial_budget=0, step_size=0, steps=0, 
         g = gt.load_graph(name)
         g.set_directed(isdirected)
 
-        vprop1 = g.new_vertex_property("int")
-        vprop2 = g.new_vertex_property("int")
-        g.vp.kt = vprop1
-        g.vp.kn = vprop2
+        # vprop1 = g.new_vertex_property("int")
+        # vprop2 = g.new_vertex_property("int")
+        # g.vp.kt = vprop1
+        # g.vp.kn = vprop2
         # g.list_properties()
 
         positive_count = 0
@@ -102,8 +55,8 @@ def main(name, isdirected, feat_column, initial_budget=0, step_size=0, steps=0, 
                 positive_count += 1
             elif g.vp.value[v] == "l" or g.vp.value[v] == "n":
                 g.vp.value[v] = 0
-            g.vp.kt[v] = 0
-            g.vp.kn[v] = 0
+            # g.vp.kt[v] = 0
+            # g.vp.kn[v] = 0
 
         print "feat 0 - %s positives (%s percent)" % (positive_count,
             100*(positive_count/float(g.num_vertices())))
@@ -120,21 +73,21 @@ def main(name, isdirected, feat_column, initial_budget=0, step_size=0, steps=0, 
 
         g = gt.load_graph_from_csv(name+".edges.csv", directed=isdirected)
         vprop = g.new_vertex_property("int")
-        vprop1 = g.new_vertex_property("int")
-        vprop2 = g.new_vertex_property("int")
+        # vprop1 = g.new_vertex_property("int")
+        # vprop2 = g.new_vertex_property("int")
         g.vp.value = vprop
-        g.vp.kt = vprop1
-        g.vp.kn = vprop2
+        # g.vp.kt = vprop1
+        # g.vp.kn = vprop2
         # g.list_properties()
         names_in = props.get_all_names(g)
         # print "names_in", names_in, len(names_in)
         out_feat_in_edges = list(set(names_in) - set(names))
         # print "edges.csv ids - feat.csv ids =", out_feat_in_edges, len(out_feat_in_edges)
-        cont = initialize_vertices(g, names, f_values, names_in)
+        cont = main.initialize_vertices(g, names, f_values, names_in)
         if cont != len(names_in):       # verifica se existem vertices no edges.csv que nao estejam em feat.csv
-            initialize_vertices_0(g, out_feat_in_edges)     # inicializa esses vertices com 0s
+            main.initialize_vertices_0(g, out_feat_in_edges)     # inicializa esses vertices com 0s
 
-    pt, pd, pn = calculate_edges(g)
+    pt, pd, pn = main.calculate_edges(g)
     print "pt:", pt
     print "pd:", pd
     print "pn:", pn
@@ -290,21 +243,14 @@ if __name__ == "__main__":
     # main("snap/gplus/116807883656585676940", False, "1", 100, 200, 12, 20)
     # main("snap/gplus/116807883656585676940", False, "154", 100, 200, 12, 20)
 
-    # feat 563 - 426 positives
-    # main("snap/gplus/116807883656585676940", False, "563", 100, 200, 12, 20)
-
-    # feat 862 - 367 positives
-    # main("snap/gplus/116807883656585676940", False, "862", 100, 200, 12, 20)
-
     # feat 798 - 247 positives (5.06458888661 percent) - pt: 0.00694257923413 pd: 0.101531923874 pn: 0.891525496892
     # pt_t: 0.00772712956488 pd_t: 0.935998054518
     # main("snap/gplus/116807883656585676940", False, "798", 100, 200, 12, 20)
 
+    # feat 563 - 426 positives
+    # feat 862 - 367 positives
     # feat 492 - 167 positives
-    # main("snap/gplus/116807883656585676940", False, "492", 100, 200, 12, 20)
-
     # feat 3 - 144 positives
-    # main("snap/gplus/116807883656585676940", False, "3", 100, 200, 12, 20)
 
     ###########################################################################
 

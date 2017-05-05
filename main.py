@@ -123,9 +123,8 @@ def main(name, isdirected, feat_column, initial_budget=0, step_size=0, steps=0, 
         f_values = feats[feat_column].values.tolist()
         # print "feat values", f_values
 
-        if f_values.count(1) > 130:
-            print "feat %s - %s positives (%s percent)" % (feat_column, f_values.count(1),
-                100*(f_values.count(1)/float(len(f_values))))
+        print "feat %s - %s positives (%s percent)" % (feat_column, f_values.count(1),
+            100*(f_values.count(1)/float(len(f_values))))
 
         g = gt.load_graph_from_csv(name+".edges.csv", directed=isdirected)
         vprop = g.new_vertex_property("int")
@@ -267,7 +266,7 @@ if __name__ == "__main__":
     # D - feat 219 - 222 positives (29.4039735099) - pt: 0.132756036636 pd: 0.413189009159 pn: 0.454054954205
     # - pt_t: 0.226233043873 pd_t: 0.756832601269
     # budget 20 - 340 (20)
-    # main("snap/facebook/1912", False, "119", 20, 20, 16, 20)
+    main("snap/facebook/1912", False, "119", 20, 20, 16, 20)
     # main("snap/facebook/1912", False, "155", 20, 20, 16, 20)
     # main("snap/facebook/1912", False, "220", 20, 20, 16, 20)
     # main("snap/facebook/1912", False, "219", 20, 20, 16, 20)
@@ -314,21 +313,14 @@ if __name__ == "__main__":
     # main("snap/gplus/116807883656585676940", False, "1", 100, 200, 12, 20)
     # main("snap/gplus/116807883656585676940", False, "154", 100, 200, 12, 20)
 
-    # feat 563 - 426 positives
-    # main("snap/gplus/116807883656585676940", False, "563", 100, 200, 12, 20)
-
-    # feat 862 - 367 positives
-    # main("snap/gplus/116807883656585676940", False, "862", 100, 200, 12, 20)
-
     # feat 798 - 247 positives (5.06458888661 percent) - pt: 0.00694257923413 pd: 0.101531923874 pn: 0.891525496892
     # pt_t: 0.00772712956488 pd_t: 0.935998054518
     # main("snap/gplus/116807883656585676940", False, "798", 100, 200, 12, 20)
 
+    # feat 563 - 426 positives
+    # feat 862 - 367 positives
     # feat 492 - 167 positives
-    # main("snap/gplus/116807883656585676940", False, "492", 100, 200, 12, 20)
-
     # feat 3 - 144 positives
-    # main("snap/gplus/116807883656585676940", False, "3", 100, 200, 12, 20)
 
     ###########################################################################
 
