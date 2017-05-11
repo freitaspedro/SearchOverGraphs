@@ -10,11 +10,11 @@ Optional: Download [Gplus](http://snap.stanford.edu/data/gplus.tar.gz), [Faceboo
 
 ### Prerequisites
 
-UNIX machine with Python 2.7 and the module [grap-tool](https://graph-tool.skewed.de).
+UNIX machine with Python 2.7 and the module [graph-tool](https://graph-tool.skewed.de).
 
 ## Running
 
-You must run first the module 'pre.py' and after the module 'main.py'.
+First you must run the module 'pre.py' and then the module 'main.py'.
 
 Attention! You can only run 'pre.py' if you have downloaded the optional datasets in #Getting Started. But you can skip this module and run directly the module 'main.py' using the pre-processed datasets.
 
@@ -29,11 +29,11 @@ main("snap/facebook/1912", 481, False)
 The first parameter in the line above is the path to the files of egonet 1912 in Facebook dataset. The second is the number of features in this egonet. The third say if the egonet is directed or not (this parameter must be always 'False').
 
 At the end of the execution of this module will be created 5 files:
-- 1912.png (Draw of the egonet)
-- 1912.out_degrees.txt 
-- 1912.in_degrees.txt
-- 1912.feat.csv	
-- 1912.edges.csv
+- 1912.png (draw of the egonet)
+- 1912.out_degrees.txt (out degrees distribution) 
+- 1912.in_degrees.txt (in degrees distribution)
+- 1912.feat.csv	(1912.feat converted)
+- 1912.edges.csv (1912.feat converted)
   
 The last two files are required for run 'main.py'.
 
@@ -45,10 +45,10 @@ main("snap/facebook/1912", False, "119", 20, 20, 16, 20)
 >> python main.py 
 ```
 
-The first parameter in the line above is the path to the files (1912.feat.csv and 1912.edges.csv) of egonet 1912. The second say if the egonet is directed or not (this parameter must be always 'False'). The third is the id of the feature that you want to search. The fourth parameter is the initial budget for the search. The fifth is the size of the increment in the current budget. The sixth say how many times this increment will occur. The last parameter is the number of runs of the simulation.
+The first parameter in the line above is the path to the files '1912.feat.csv' and '1912.edges.csv'. The second say if the egonet is directed or not (this parameter must be always 'False'). The third is the id of the feature that you want to search. The fourth parameter is the initial budget for the search. The fifth is the size of the increment in the current budget. The sixth say how many times this increment will occur. The last parameter is the number of runs of the simulation.
 
 At the end of the execution of this module will be created 7 files:
-- starts.txt (Randomly chosen vertices)
+- starts.txt (randomly chosen vertices)
 - 1912_f119_BFS.search.csv
 - 1912_f119_DFS.search.csv
 - 1912_f119_HEU1.search.csv
