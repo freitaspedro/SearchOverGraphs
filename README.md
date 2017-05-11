@@ -6,9 +6,7 @@ In this project we use the homophily - inherent in many real networks - to propo
 
 The Python modules and the pre-processed datasets ('\snap' and '\uci') must be downloaded and maintained in the same directory in your local machine.
 
-```
-Optional: Download [Gplus](http://snap.stanford.edu/data/gplus.tar.gz), [Facebook](http://snap.stanford.edu/data/facebook.tar.gz), [Twitter](http://snap.stanford.edu/data/twitter.tar.gz), [Polblogs](http://networkdata.ics.uci.edu/data/polblogs/polblogs.gml) and [Polbooks](http://networkdata.ics.uci.edu/data/polbooks/polbooks.gml) datasets. 
-```
+Optional: Download [Gplus](http://snap.stanford.edu/data/gplus.tar.gz), [Facebook](http://snap.stanford.edu/data/facebook.tar.gz), [Twitter](http://snap.stanford.edu/data/twitter.tar.gz), [Polblogs](http://networkdata.ics.uci.edu/data/polblogs/polblogs.gml) and [Polbooks](http://networkdata.ics.uci.edu/data/polbooks/polbooks.gml) datasets.
 
 ### Prerequisites
 
@@ -18,9 +16,7 @@ UNIX machine with Python 2.7 and the module [grap-tool](https://graph-tool.skewe
 
 You must run first the module 'pre.py' and after the module 'main.py'.
 
-```
 Attention! You can only run 'pre.py' if you have downloaded the optional datasets in #Getting Started. But you can skip this module and run directly the module 'main.py' using the pre-processed datasets.
-```
 
 You can run 'pre.py' uncommenting any line in the main and executing this file in your terminal, p.e: 
 
