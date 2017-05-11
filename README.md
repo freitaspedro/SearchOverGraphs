@@ -33,7 +33,7 @@ At the end of the execution of this module will be created 5 files:
 - 1912.out_degrees.txt (out degrees distribution) 
 - 1912.in_degrees.txt (in degrees distribution)
 - 1912.feat.csv	(1912.feat converted)
-- 1912.edges.csv (1912.feat converted)
+- 1912.edges.csv (1912.edges converted)
   
 The last two files are required for run 'main.py'.
 
