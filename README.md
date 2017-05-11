@@ -8,6 +8,7 @@ The Python modules and the pre-processed datasets ('\snap' and '\uci') must be d
 
 ```
 Optional: Download [Gplus](http://snap.stanford.edu/data/gplus.tar.gz), [Facebook](http://snap.stanford.edu/data/facebook.tar.gz), [Twitter](http://snap.stanford.edu/data/twitter.tar.gz), [Polblogs](http://networkdata.ics.uci.edu/data/polblogs/polblogs.gml) and [Polbooks](http://networkdata.ics.uci.edu/data/polbooks/polbooks.gml) datasets. 
+```
 
 ### Prerequisites
 
@@ -19,6 +20,7 @@ You must run first the module 'pre.py' and after the module 'main.py'.
 
 ```
 Attention! You can only run 'pre.py' if you have downloaded the optional datasets in #Getting Started. But you can skip this module and run directly the module 'main.py' using the pre-processed datasets.
+```
 
 You can run 'pre.py' uncommenting any line in the main and executing this file in your terminal, p.e: 
 
@@ -26,6 +28,7 @@ You can run 'pre.py' uncommenting any line in the main and executing this file i
 main("snap/facebook/1912", 481, False)
 
 >> python pre.py
+```
 
 The first parameter in the line above is the path to the files of egonet 1912 in Facebook dataset. The second is the number of features in this egonet. The third say if the egonet is directed or not (this parameter must be always 'False').
 
@@ -44,6 +47,7 @@ You can run 'main.py' uncommenting any line in the main and executing this file 
 main("snap/facebook/1912", False, "119", 20, 20, 16, 20)
 
 >> python main.py 
+```
 
 The first parameter in the line above is the path to the files (1912.feat.csv and 1912.edges.csv) of egonet 1912. The second say if the egonet is directed or not (this parameter must be always 'False'). The third is the id of the feature that you want to search. The fourth parameter is the initial budget for the search. The fifth is the size of the increment in the current budget. The sixth say how many times this increment will occur. The last parameter is the number of runs of the simulation.
 
@@ -61,7 +65,7 @@ The last six with information about the time, the positives and the exlpored+dis
 ## Authors
 
 * **Pedro Freitas** - pfreitas@land.ufrj.br
-* **Vitor Cardoso** 
+* **Victor Cardoso** 
 * **Giulio Iacobelli** 
 * **Daniel Figueiredo** 
 
