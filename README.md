@@ -58,6 +58,9 @@ At the end of the execution of this module will be created 7 files:
 
 The last six with information about the time, the positives and the exlpored+discoverd vertices in each type of search (BFS, DFS, HEU1, HEU2, HEU3 and MOD*).
 
+P.S.: For the Polblogs and Polbooks datasets the input params is a little bit different because their files have another format (.gml). But seeing the commented mains in the code is easy to understand them. 
+
+
 ## Authors
 
 * **Pedro Freitas** - pfreitas@land.ufrj.br
