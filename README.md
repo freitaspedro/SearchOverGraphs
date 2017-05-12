@@ -16,9 +16,9 @@ UNIX machine with Python 2.7 and the module [graph-tool](https://graph-tool.skew
 
 First you must run the module 'pre.py' and then the module 'main.py'.
 
-Attention! You can only run 'pre.py' if you have downloaded the optional datasets in #Getting Started. But you can skip this module and run directly the module 'main.py' using the pre-processed datasets.
+**Attention!** You can only run 'pre.py' if you have downloaded the optional datasets in **Getting Started**. But you can skip this module and run directly the module 'main.py' using the pre-processed datasets.
 
-You can run 'pre.py' uncommenting any line in the main and executing this file in your terminal, p.e: 
+You can run 'pre.py' uncommenting any line in the __main__ and executing this file in your terminal, p.e: 
 
 ```
 main("snap/facebook/1912", 481, False)
@@ -26,10 +26,11 @@ main("snap/facebook/1912", 481, False)
 >> python pre.py
 ```
 
-The first parameter in the line above is the path to the files of egonet 1912 in Facebook dataset. The second is the number of features in this egonet. The third say if the egonet is directed or not (this parameter must be always 'False').
+The first parameter in the line above is the path to the files of egonet 1912 in Facebook dataset. The second is the number of features in this egonet. The third is a boolean that say if the egonet is directed or not (this parameter must be always 'False').
 
-At the end of the execution of this module will be created 5 files:
-- 1912.png (draw of the egonet)
+At the end of the execution of this module will be created 6 files:
+- 1912.png (picture of the egonet)
+- 1912.props.txt (some properties of the egonet)
 - 1912.out_degrees.txt (out degrees distribution) 
 - 1912.in_degrees.txt (in degrees distribution)
 - 1912.feat.csv	(1912.feat converted)
@@ -37,7 +38,7 @@ At the end of the execution of this module will be created 5 files:
   
 The last two files are required for run 'main.py'.
 
-You can run 'main.py' uncommenting any line in the main and executing this file in your terminal, p.e: 
+You can run 'main.py' uncommenting any line in the __main__ and executing this file in your terminal, p.e: 
 
 ```
 main("snap/facebook/1912", False, "119", 20, 20, 16, 20)
@@ -45,7 +46,7 @@ main("snap/facebook/1912", False, "119", 20, 20, 16, 20)
 >> python main.py 
 ```
 
-The first parameter in the line above is the path to the files '1912.feat.csv' and '1912.edges.csv'. The second say if the egonet is directed or not (this parameter must be always 'False'). The third is the id of the feature that you want to search. The fourth parameter is the initial budget for the search. The fifth is the size of the increment in the current budget. The sixth say how many times this increment will occur. The last parameter is the number of runs of the simulation.
+The first parameter in the line above is the path to the files '1912.feat.csv' and '1912.edges.csv'. The second is a boolean that say if the egonet is directed or not (this parameter must be always 'False'). The third is the identifier of the feature that you want to search. The fourth parameter is the initial budget for the search. The fifth is the size of the increment in the current budget. The sixth say how many times this increment will occur. The last parameter is the number of runs of the simulation.
 
 At the end of the execution of this module will be created 7 files:
 - starts.txt (randomly chosen vertices)
@@ -56,7 +57,7 @@ At the end of the execution of this module will be created 7 files:
 - 1912_f119_HEU3.search.csv
 - 1912_f119_MOD.search.csv
 
-The last six with information about the time, the positives and the exlpored+discoverd vertices in each type of search (BFS, DFS, HEU1, HEU2, HEU3 and MOD*).
+The last six files have information about the time, the positives and the exlpored+discoverd vertices in each type of search (BFS, DFS, HEU1, HEU2, HEU3 and MOD*).
 
 P.S.: For the Polblogs and Polbooks datasets the input params is a little bit different because their files have another format (.gml). But seeing the commented mains in the code is easy to understand them. 
 
