@@ -17,8 +17,46 @@ import search2
 import numpy as np
 import csv
 import os
-import pre
-import main
+
+def initialize_vertices(g, names, f_values, names_in):
+    i = 0
+    cont = 0
+    for curr_name in names:                 # atualiza os vertices com os valores da feat
+        if curr_name in names_in:                   # se o vertice tiver em feat.csv e edges.csv
+            v = gt.find_vertex(g, g.vp.name, curr_name)
+            v = int(v[0])
+            g.vp.value[v] = f_values[i]
+            cont = cont + 1
+        i = i + 1
+    return cont
+
+def initialize_vertices_0(g, rest):
+    for name in rest:
+        v = gt.find_vertex(g, g.vp.name, str(name))
+        v = int(v[0])
+        g.vp.value[v] = 0
+
+def calculate_edges(g):
+    pt = 0.0
+    pd = 0.0
+    pn = 0.0
+    for e in g.edges():
+        src = e.source()
+        tgt = e.target()
+        if g.vp.value[src] != g.vp.value[tgt]:
+            pd = pd + 1
+        elif int(g.vp.value[src]) == 0 and int(g.vp.value[tgt]) == 0:
+            pn = pn + 1
+        else:
+            pt = pt + 1
+    num_edges = g.num_edges()
+    if (pt+pd+pn) != num_edges:
+        print "err in calculate pt, pd and pn"
+    else:
+        pt = pt/float(num_edges)
+        pd = pd/float(num_edges)
+        pn = pn/float(num_edges)
+    return pt, pd, pn
 
 def save(steps, name, feat_column, mtype, budgets, sum_time, time, positives_mean, positives_stdev, eplusd_mean, eplusd_stdev):
     filename = name+"_f"+feat_column+"_"+mtype+".search.csv"
@@ -47,11 +85,6 @@ def main(name, isdirected, feat_column, initial_budget=0, step_size=0, steps=0, 
     if feat_column == "-1":             # polblogs, polbooks
         g = gt.load_graph(name)
         g.set_directed(isdirected)
-
-        vprop1 = g.new_vertex_property("int")
-        vprop2 = g.new_vertex_property("int")
-        g.vp.kt = vprop1
-        g.vp.kn = vprop2
         # g.list_properties()
 
         positive_count = 0
@@ -63,8 +96,6 @@ def main(name, isdirected, feat_column, initial_budget=0, step_size=0, steps=0, 
                 positive_count += 1
             elif g.vp.value[v] == "l" or g.vp.value[v] == "n":
                 g.vp.value[v] = 0
-            g.vp.kt[v] = 0
-            g.vp.kn[v] = 0
 
         print "feat 0 - %s positives (%s percent)" % (positive_count,
             100*(positive_count/float(g.num_vertices())))
@@ -81,21 +112,17 @@ def main(name, isdirected, feat_column, initial_budget=0, step_size=0, steps=0, 
 
         g = gt.load_graph_from_csv(name+".edges.csv", directed=isdirected)
         vprop = g.new_vertex_property("int")
-        vprop1 = g.new_vertex_property("int")
-        vprop2 = g.new_vertex_property("int")
         g.vp.value = vprop
-        g.vp.kt = vprop1
-        g.vp.kn = vprop2
         # g.list_properties()
         names_in = props.get_all_names(g)
         # print "names_in", names_in, len(names_in)
         out_feat_in_edges = list(set(names_in) - set(names))
         # print "edges.csv ids - feat.csv ids =", out_feat_in_edges, len(out_feat_in_edges)
-        cont = main.initialize_vertices(g, names, f_values, names_in)
+        cont = initialize_vertices(g, names, f_values, names_in)
         if cont != len(names_in):       # verifica se existem vertices no edges.csv que nao estejam em feat.csv
-            main.initialize_vertices_0(g, out_feat_in_edges)     # inicializa esses vertices com 0s
+            initialize_vertices_0(g, out_feat_in_edges)     # inicializa esses vertices com 0s
 
-    pt, pd, pn = main.calculate_edges(g)
+    pt, pd, pn = calculate_edges(g)
     print "pt:", pt
     print "pd:", pd
     print "pn:", pn
@@ -116,13 +143,15 @@ def main(name, isdirected, feat_column, initial_budget=0, step_size=0, steps=0, 
     starts = np.random.choice(inn, 20)  # sorteia aleatoriamento 20 vertices na maior componente conexa
     # print "starts", starts
     filename = name+"_f"+feat_column+".starts.txt"
-    np.savetxt(filename, starts, newline=" ")
+    np.savetxt(filename, starts, delimiter=" ")
     print "%s saved" % filename
 
     budgets = [0]*(steps+1)
     for i in xrange(0, steps+1):
         budgets[i] = initial_budget+i*step_size
     # print "budgets", budgets
+
+    num_vertices = g.num_vertices()
 
     mean_bfs_positives, stdev_bfs_positives, mean_bfs_eplusd, stdev_bfs_eplusd, sum_bfs_time, mean_bfs_time = \
     [0]*(steps+1), [0]*(steps+1), [0]*(steps+1), [0]*(steps+1), [0]*(steps+1), [0]*(steps+1)
@@ -154,22 +183,22 @@ def main(name, isdirected, feat_column, initial_budget=0, step_size=0, steps=0, 
             mean_heu1_eplusd, stdev_heu1_eplusd, sum_dfs_time, mean_dfs_time)
 
         # ideia 1 - ocorrer em todas as arestas
-        heu1_positives, heu1_eplusd, heu1_time = search2.ot_heu_search(g, start, budgets, pt_t, pd_t, 1)
+        heu1_positives, heu1_eplusd, heu1_time = search2.ot_heu_search(g, num_vertices, start, budgets, pt_t, pd_t, 1)
         update_budgets(runs, steps, heu1_positives, heu1_eplusd, heu1_time, mean_heu1_positives, stdev_heu1_positives,
             mean_heu1_eplusd, stdev_heu1_eplusd, sum_heu1_time, mean_heu1_time)
 
         # ideia 2 - ocorrer na maioria das arestas
-        heu2_positives, heu2_eplusd, heu2_time = search2.ot_heu_search(g, start, budgets, pt_t, pd_t, 2)
+        heu2_positives, heu2_eplusd, heu2_time = search2.ot_heu_search(g, num_vertices, start, budgets, pt_t, pd_t, 2)
         update_budgets(runs, steps, heu2_positives, heu2_eplusd, heu2_time, mean_heu2_positives, stdev_heu2_positives,
             mean_heu2_eplusd, stdev_heu2_eplusd, sum_heu2_time, mean_heu2_time)
 
         # ideia 3 - ocorrer em pelo menos uma aresta
-        heu3_positives, heu3_eplusd, heu3_time = search2.ot_heu_search(g, start, budgets, pt_t, pd_t, 3)
+        heu3_positives, heu3_eplusd, heu3_time = search2.ot_heu_search(g, num_vertices, start, budgets, pt_t, pd_t, 3)
         update_budgets(runs, steps, heu3_positives, heu3_eplusd, heu3_time, mean_heu3_positives, stdev_heu3_positives,
             mean_heu3_eplusd, stdev_heu3_eplusd, sum_heu3_time, mean_heu3_time)
 
         # maximum observed degree (mod adaptado)
-        mod_positives, mod_eplusd, mod_time = search2.mod(g, start, budgets)
+        mod_positives, mod_eplusd, mod_time = search2.mod(g, num_vertices, start, budgets)
         update_budgets(runs, steps, mod_positives, mod_eplusd, mod_time, mean_mod_positives, stdev_mod_positives,
             mean_mod_eplusd, stdev_mod_eplusd, sum_mod_time, mean_mod_time)
         j += 1
@@ -186,7 +215,6 @@ def main(name, isdirected, feat_column, initial_budget=0, step_size=0, steps=0, 
         mean_heu3_eplusd, stdev_heu3_eplusd)
     save(steps, name, feat_column, "MODs", budgets, sum_mod_time, mean_mod_time, mean_mod_positives, stdev_mod_positives,
         mean_mod_eplusd, stdev_mod_eplusd)
-
 
 
 if __name__ == "__main__":

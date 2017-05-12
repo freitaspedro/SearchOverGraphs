@@ -36,8 +36,8 @@ def main(xml_in, xml_out):
     it = iter(et.iterparse(xml_in, events=("end", "end-ns", "start", "start-ns"), parser=p))
     jnk, root = next(it)
 
-    pubs = set([u"article", u"inproceedings", u"proceedings"])            # tipos de publicacao validas
-    ways = [u"conf", u"journals"]            # meios de publicacao validos
+    pubs = set([u"inproceedings"])            # tipos de publicacao validas
+    ways = [u"conf"]            # meios de publicacao validos
     inval = set([u"et al.", u"anonymous", u"None"])          # nomes de autor invalidos
 
     author_conf = {}
@@ -77,7 +77,9 @@ def main(xml_in, xml_out):
     g.vp.confs = vprop1
 
     id_name = {}            # mapeia os ids gerados pelo graph tool com os nomes dos autores
-    print "len(author_conf)", len(author_conf)          # len(author_conf) 1901632
+    print "len(author_conf)", len(author_conf)
+    # len(author_conf) 1901632 - pubs = set([u"article", u"inproceedings", u"proceedings"]); ways = [u"conf", u"journals"]
+    # len(author_conf) 1268107 - pubs = set([u"inproceedings"]); ways = [u"conf"]
     print "adding vertices..."
     for k, v in author_conf.iteritems():
         vertex = g.add_vertex()
@@ -85,7 +87,9 @@ def main(xml_in, xml_out):
         g.vp.confs[vertex] = set(v)
         id_name[k] = int(vertex)
 
-    print "len(author_author)", len(author_author)          # len(author_author) 8569010
+    print "len(author_author)", len(author_author)
+    # len(author_author) 8569010 - pubs = set([u"article", u"inproceedings", u"proceedings"]); ways = [u"conf", u"journals"]
+    # len(author_author) 5243768 - pubs = set([u"inproceedings"]); ways = [u"conf"]
     print "adding edges..."
     cnt = 0
     for v in author_author:

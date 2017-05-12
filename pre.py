@@ -53,8 +53,8 @@ def props_draw_save(name, isdirected, isgml):
     write_dict_txt(name+".out_degrees.txt", out_degree_dist)
     write_dict_txt(name+".in_degrees.txt", in_degree_dist)
 
-    gt.graph_draw(g, output=name+".png")
-    print "%s.png saved" % name
+    # gt.graph_draw(g, output=name+".png")
+    # print "%s.png saved" % name
 
 def main(name, headers, isdirected):
     if headers == -1:       # polblogs, polbooks
@@ -66,8 +66,11 @@ def main(name, headers, isdirected):
 
 
 if __name__ == "__main__":
-    main("snap/facebook/1912", 481, False)
+    # main("snap/facebook/1912", 481, False)
     # main("snap/gplus/116807883656585676940", 3751, False)
     # main("uci/polblogs/polblogs.gml", -1, False)
     # main("snap/twitter/256497288", 1359, False)
     # main("uci/polbooks/polbooks.gml", -1, False)
+
+    # main("hugo/dblp_g.xml.gz", -1, False)
+    main("hugo/gcc_dblp_g.xml.gz", -1, False)

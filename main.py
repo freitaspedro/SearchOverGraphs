@@ -18,7 +18,6 @@ import numpy as np
 import csv
 import os
 import time
-import pre
 
 def initialize_vertices(g, names, f_values, names_in):
     i = 0
@@ -87,7 +86,6 @@ def display_save(name, feat_column, mtype, budget, sum_time, time, positives_mea
         out_csv = csv.writer(open(filename, "a"))
         out_csv.writerow([budget, time, positives_mean, positives_stdev, explored_mean, explored_stdev, eplusd_mean, eplusd_stdev])
     print "%s saved" % filename
-
 
 def main(name, isdirected, feat_column, initial_budget=0, step_size=0, steps=0, runs=0):
     if feat_column == "-1":             # polblogs, polbooks
@@ -163,7 +161,7 @@ def main(name, isdirected, feat_column, initial_budget=0, step_size=0, steps=0, 
     starts = np.random.choice(inn, 20)  # sorteia aleatoriamento 20 vertices na maior componente conexa
     # print "starts", starts
     filename = name+"_f"+feat_column+".starts.txt"
-    np.savetxt(filename, starts, newline=" ")
+    np.savetxt(filename, starts, delimiter=" ")
     print "%s saved" % filename
 
     for i in xrange(0, steps+1):
@@ -252,7 +250,6 @@ def main(name, isdirected, feat_column, initial_budget=0, step_size=0, steps=0, 
         display_save(name, feat_column, "MODs", budget, sum(mod_time), statistics.mean(mod_time), statistics.mean(mod_positives_t),
             statistics.pstdev(mod_positives_t), statistics.mean(mod_explored_t), statistics.pstdev(mod_explored_t),
             statistics.mean(mod_eplusd_t), statistics.pstdev(mod_eplusd_t))
-
 
 
 if __name__ == "__main__":

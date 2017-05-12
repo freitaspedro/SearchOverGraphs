@@ -71,6 +71,16 @@ def depth_first_search(g, start, budgets):
     dfs_time = [visitor.time_t[i-1] for i in budgets]
     return dfs_positives, dfs_time
 
+def breadth_first_search2(g, start, budgets):
+    # TODO
+    # return bfs_positives, bfs_time
+    return -1
+
+def depth_first_search2(g, start, budgets):
+    # TODO
+    # return dfs_positives, dfs_time
+    return -1
+
 def p_t_k(k, kt, kn, pt_t, pd_t):
     ini = max(0, k-kn)
     end = min(kt, k)
@@ -104,18 +114,12 @@ def heuristic(pt_t, pd_t, kt, kn, mtype):
         MapHeu3[(pt_t, pd_t, kt, kn)] = pfra
         return pfra
 
-def ot_heu_search(g, start, budgets, pt_t, pd_t, mtype):
+def ot_heu_search(g, num_vertices, start, budgets, pt_t, pd_t, mtype):
     max_budget = budgets[-1]
     start_time = time.time()
     positives_t, eplusd_t, time_t = [0]*max_budget, [0]*max_budget, [0]*max_budget
-    # for v in g.vertices():
-    #     g.vp.kt[v] = 0
-    #     g.vp.kn[v] = 0
-    num_vertices = g.num_vertices()
     kt_values = [0]*num_vertices
     kn_values = [0]*num_vertices
-    # hv = dict.fromkeys(range(num_vertices), 0)
-    # heu_values = heap.priority_dict(hv)
     heu_values = {}
     status = [-1]*num_vertices          # status -1 - desconhecido, status 0 - descoberto, status +1 - explorado
     positives = 0
@@ -133,9 +137,7 @@ def ot_heu_search(g, start, budgets, pt_t, pd_t, mtype):
                 if status[index] == -1:            # vertice desconhecido passa a descoberto
                     status[index] = 0
                 if status[index] == 0:     # incrementa kt e calcula heuristica para descobertos
-                    # g.vp.kt[n] += 1
                     kt_values[index] += 1
-                    # heu_values[index] = heuristic(pt_t, pd_t, g.vp.kt[n], g.vp.kn[n], mtype) * -1
                     heu_values[index] = heuristic(pt_t, pd_t, kt_values[index], kn_values[index], mtype)
         else:                                       # constata que ele nao tem a caracteristica
             for n in start.out_neighbours():
@@ -143,12 +145,9 @@ def ot_heu_search(g, start, budgets, pt_t, pd_t, mtype):
                 if status[index] == -1:
                     status[index] = 0
                 if status[index] == 0:
-                    # g.vp.kn[n] += 1
                     kn_values[index] += 1
-                    # heu_values[int(n)] = heuristic(pt_t, pd_t, g.vp.kt[n], g.vp.kn[n], mtype) * -1
                     heu_values[index] = heuristic(pt_t, pd_t, kt_values[index], kn_values[index], mtype)
         # print "heu_values", heu_values
-        # start = heu_values.pop_smallest()
         start = max(heu_values, key=lambda i: heu_values[i])
         del heu_values[start]
         # print "status 1 -", status.count(1)
@@ -167,14 +166,85 @@ def ot_heu_search(g, start, budgets, pt_t, pd_t, mtype):
     heu_time = [time_t[i-1] for i in budgets]
     return heu_positives, heu_eplusd, heu_time
 
-def mod(g, start, budgets):
+def dy_heu_search(g, num_vertices, start, budgets, ini, mtype):
+    max_budget = budgets[-1]
+    start_time = time.time()
+    positives_t, eplusd_t, time_t = [0]*max_budget, [0]*max_budget, [0]*max_budget
+    kt_values = [0]*num_vertices
+    kn_values = [0]*num_vertices
+    heu_values = {}
+    status = [-1]*num_vertices          # status -1 - desconhecido, status 0 - descoberto, status +1 - explorado
+    positives = 0
+    status[int(start)] = 1
+    nt, nd, nn = ini, ini, ini                      # nt - num de arestas 't'-'t', nd - num de arestas 't'-'n', nn - num de arestas 'n'-'n'
+    i = 0
+    # print "max_budget", max_budget
+    while i < max_budget:
+        pt_t = nt/float(nt+nn)                  # calculo dinamico de pt_t e pd_t
+        pd_t = nd/float(nt+nd)
+        print "pt_t", pt_t
+        print "pd_t", pd_t
+        # print "start", start
+        # neighbours = [int(n) for n in start.out_neighbours()]
+        # print "neighbours", neighbours
+        value_start = int(g.vp.value[start])
+        if value_start == 1:          # ao explorar o vertice constata que ele tem a caracteristica
+            positives += 1
+            for n in start.out_neighbours():
+                index = int(n)
+                if status[index] == -1:            # vertice desconhecido passa a descoberto
+                    status[index] = 0
+                if status[index] == 0:     # incrementa kt e calcula heuristica para descobertos
+                    kt_values[index] += 1
+                    heu_values[index] = heuristic(pt_t, pd_t, kt_values[index], kn_values[index], mtype)
+        else:                                       # constata que ele nao tem a caracteristica
+            for n in start.out_neighbours():
+                index = int(n)
+                if status[index] == -1:
+                    status[index] = 0
+                if status[index] == 0:
+                    kn_values[index] += 1
+                    heu_values[index] = heuristic(pt_t, pd_t, kt_values[index], kn_values[index], mtype)
+        # print "heu_values", heu_values
+        next_start = max(heu_values, key=lambda i: heu_values[i])
+        del heu_values[next_start]
+        # print "status 1 -", status.count(1)
+        # print "status 0 -", status.count(0)
+        # print "status -1 -", status.count(-1)
+        status[next_start] = 1
+        next_start = g.vertex(next_start)         # prox vertice a ser explorado
+        value_next_start = int(g.vp.value[next_start])
+        # dependendo do par de valores de vertice explorado e do prox vertice a ser explorado atualiza nt, nd ou nn
+        print "value_start", value_start
+        print "value_next_start", value_next_start
+        if value_start != value_next_start:
+            nd = nd + 1
+        elif value_start == 0 and value_next_start == 0:
+            nn = nn + 1
+        else:
+            nt = nt + 1
+        print "nt", nt
+        print "nd", nd
+        print "nn", nn
+        start = next_start         # prox vertice a ser explorado se torna o vertice da vez
+        positives_t[i] = positives
+        # eplusd_t[i] = i+1+status.count(0)
+        eplusd_t[i] = i+1
+        time_t[i] = time.time() - start_time
+        # print "i", i
+        if i == 2:  break
+        i += 1
+    heu_positives = [positives_t[i-1] for i in budgets]
+    heu_eplusd = [eplusd_t[i-1] for i in budgets]
+    heu_time = [time_t[i-1] for i in budgets]
+    return heu_positives, heu_eplusd, heu_time
+
+def mod(g, num_vertices, start, budgets):
     max_budget = budgets[-1]
     start_time = time.time()
     positives_t, eplusd_t, time_t = [0]*max_budget, [0]*max_budget, [0]*max_budget
 
-    num_vertices = g.num_vertices()
     ktv = dict.fromkeys(range(num_vertices), 1)
-    # kt_values = heap.priority_dict(ktv)
     kt_values = {}
     status = [-1]*num_vertices          # status -1 - desconhecido, status 0 - descoberto, status +1 - explorado
     positives = 0
@@ -192,7 +262,6 @@ def mod(g, start, budgets):
                     status[index] = 0
                     kt_values[index] = 0           # inicializa kt com 0 para os vertices descobertos
                 if status[index] == 0:
-                    # kt_values[index] -= 1
                     kt_values[index] += 1
         else:                                       # constata que ele nao tem a caracteristica
             for n in start.out_neighbours():
@@ -201,7 +270,6 @@ def mod(g, start, budgets):
                     status[index] = 0
                     kt_values[index] = 0
         # print "kt_values", kt_values
-        # start = kt_values.pop_smallest()
         start = max(kt_values, key=lambda i: kt_values[i])
         del kt_values[start]
         # print "status 1 -", status.count(1)
