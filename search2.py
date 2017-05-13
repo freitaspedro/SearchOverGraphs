@@ -71,15 +71,51 @@ def depth_first_search(g, start, budgets):
     dfs_time = [visitor.time_t[i-1] for i in budgets]
     return dfs_positives, dfs_time
 
-def breadth_first_search2(g, start, budgets):
-    # TODO
-    # return bfs_positives, bfs_time
-    return -1
+def breadth_first_search2(g, start, budgets, num_vertices):
+    max_budget = budgets[-1]
+    start_time = time.time()
+    positives_t, time_t = [0]*max_budget, [0]*max_budget
+    status = [0]*num_vertices          # status 0 - desconhecido, status 1 - explorado
+    positives = 0
+    queue = [start]
+    i = 0
+    while queue and  i < max_budget:
+        start = queue.pop(0)        # retira da fila o vertice mais antigo
+        if status[int(start)] == 0:
+            if int(g.vp.value[start]) == 1:
+                positives += 1
+            queue.extend(list(start.out_neighbours()))      # poe na fila os vizinhos do vertice explorado
+            status[int(start)] = 1
+            positives_t[i] = positives
+            time_t[i] = time.time() - start_time
+            # print "i", i
+            i += 1
+    bfs_positives = [positives_t[i-1] for i in budgets]
+    bfs_time = [time_t[i-1] for i in budgets]
+    return bfs_positives, bfs_time
 
-def depth_first_search2(g, start, budgets):
-    # TODO
-    # return dfs_positives, dfs_time
-    return -1
+def depth_first_search2(g, start, budgets, num_vertices):
+    max_budget = budgets[-1]
+    start_time = time.time()
+    positives_t, time_t = [0]*max_budget, [0]*max_budget
+    status = [0]*num_vertices          # status 0 - desconhecido, status 1 - explorado
+    positives = 0
+    stack = [start]
+    i = 0
+    while stack and  i < max_budget:
+        start = stack.pop()        # retira da pilha o vertice mais recente
+        if status[int(start)] == 0:
+            if int(g.vp.value[start]) == 1:
+                positives += 1
+            stack.extend(list(start.out_neighbours()))      # poe na pilha os vizinhos do vertice explorado
+            status[int(start)] = 1
+            positives_t[i] = positives
+            time_t[i] = time.time() - start_time
+            # print "i", i
+            i += 1
+    dfs_positives = [positives_t[i-1] for i in budgets]
+    dfs_time = [time_t[i-1] for i in budgets]
+    return dfs_positives, dfs_time
 
 def p_t_k(k, kt, kn, pt_t, pd_t):
     ini = max(0, k-kn)

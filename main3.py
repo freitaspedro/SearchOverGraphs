@@ -160,7 +160,11 @@ def main(name, isdirected, feat_column, initial_budget=0, step_size=0, steps=0, 
 
     bfs_positives_t, bfs_eplusd_t, bfs_time_t = [[0]*runs for count in range(steps+1)], [[0]*runs for count in range(steps+1)], \
     [[0]*runs for count in range(steps+1)]
+    bfs2_positives_t, bfs2_eplusd_t, bfs2_time_t = [[0]*runs for count in range(steps+1)], [[0]*runs for count in range(steps+1)], \
+    [[0]*runs for count in range(steps+1)]
     dfs_positives_t, dfs_eplusd_t, dfs_time_t = [[0]*runs for count in range(steps+1)], [[0]*runs for count in range(steps+1)], \
+    [[0]*runs for count in range(steps+1)]
+    dfs2_positives_t, dfs2_eplusd_t, dfs2_time_t = [[0]*runs for count in range(steps+1)], [[0]*runs for count in range(steps+1)], \
     [[0]*runs for count in range(steps+1)]
     heu1_positives_t, heu1_eplusd_t, heu1_time_t = [[0]*runs for count in range(steps+1)], [[0]*runs for count in range(steps+1)], \
     [[0]*runs for count in range(steps+1)]
@@ -186,8 +190,14 @@ def main(name, isdirected, feat_column, initial_budget=0, step_size=0, steps=0, 
         bfs_positives, bfs_time = search2.breadth_first_search(g, start, budgets)         # breadth first search (BFS)
         bfs_positives_t, bfs_time_t = store(steps, j, bfs_positives_t, bfs_time_t, bfs_positives, bfs_time)
 
+        bfs2_positives, bfs2_time = search2.breadth_first_search2(g, start, budgets, num_vertices)         # breadth first search (BFS)
+        bfs2_positives_t, bfs2_time_t = store(steps, j, bfs2_positives_t, bfs2_time_t, bfs2_positives, bfs2_time)
+
         dfs_positives, dfs_time = search2.depth_first_search(g, start, budgets)           # depth first search (DFS)
         dfs_positives_t, dfs_time_t = store(steps, j, dfs_positives_t, dfs_time_t, dfs_positives, dfs_time)
+
+        dfs2_positives, dfs2_time = search2.depth_first_search2(g, start, budgets, num_vertices)           # depth first search (DFS)
+        dfs2_positives_t, dfs2_time_t = store(steps, j, dfs2_positives_t, dfs2_time_t, dfs2_positives, dfs2_time)
 
         # ideia 1 - ocorrer em todas as arestas
         heu1_positives, heu1_eplusd, heu1_time = search2.ot_heu_search(g, num_vertices, start, budgets, pt_t, pd_t, 1)
@@ -221,7 +231,9 @@ def main(name, isdirected, feat_column, initial_budget=0, step_size=0, steps=0, 
         j += 1
 
     save(steps, name, feat_column, "BFS", budgets, bfs_time_t, bfs_positives_t, bfs_eplusd_t)
+    save(steps, name, feat_column, "BFS2", budgets, bfs2_time_t, bfs2_positives_t, bfs2_eplusd_t)
     save(steps, name, feat_column, "DFS", budgets, dfs_time_t, dfs_positives_t, dfs_eplusd_t)
+    save(steps, name, feat_column, "DFS2", budgets, dfs2_time_t, dfs2_positives_t, dfs2_eplusd_t)
     save(steps, name, feat_column, "HEU1", budgets, heu1_time_t, heu1_positives_t, heu1_eplusd_t)
     save(steps, name, feat_column, "HEU2", budgets, heu2_time_t, heu2_positives_t, heu2_eplusd_t)
     save(steps, name, feat_column, "fakeHEU2", budgets, fake_heu2_time_t, fake_heu2_positives_t, fake_heu2_eplusd_t)
