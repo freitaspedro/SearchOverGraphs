@@ -218,8 +218,8 @@ def dy_heu_search(g, num_vertices, start, budgets, ini, mtype):
     while i < max_budget:
         pt_t = nt/float(nt+nn)                  # calculo dinamico de pt_t e pd_t
         pd_t = nd/float(nt+nd)
-        print "pt_t", pt_t
-        print "pd_t", pd_t
+        # print "pt_t", pt_t
+        # print "pd_t", pd_t
         # print "start", start
         # neighbours = [int(n) for n in start.out_neighbours()]
         # print "neighbours", neighbours
@@ -251,24 +251,23 @@ def dy_heu_search(g, num_vertices, start, budgets, ini, mtype):
         next_start = g.vertex(next_start)         # prox vertice a ser explorado
         value_next_start = int(g.vp.value[next_start])
         # dependendo do par de valores de vertice explorado e do prox vertice a ser explorado atualiza nt, nd ou nn
-        print "value_start", value_start
-        print "value_next_start", value_next_start
+        # print "value_start", value_start
+        # print "value_next_start", value_next_start
         if value_start != value_next_start:
             nd = nd + 1
         elif value_start == 0 and value_next_start == 0:
             nn = nn + 1
         else:
             nt = nt + 1
-        print "nt", nt
-        print "nd", nd
-        print "nn", nn
+        # print "nt", nt
+        # print "nd", nd
+        # print "nn", nn
         start = next_start         # prox vertice a ser explorado se torna o vertice da vez
         positives_t[i] = positives
         # eplusd_t[i] = i+1+status.count(0)
         eplusd_t[i] = i+1
         time_t[i] = time.time() - start_time
         # print "i", i
-        if i == 2:  break
         i += 1
     heu_positives = [positives_t[i-1] for i in budgets]
     heu_eplusd = [eplusd_t[i-1] for i in budgets]

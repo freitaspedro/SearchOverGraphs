@@ -10,6 +10,7 @@ parametro.
 import xml.etree.ElementTree as et
 import graph_tool.all as gt
 import itertools as itools
+import sys
 
 def get_tabel(name):
     html_map = {}                  #guarda o mapeamento dos caracteres html
@@ -113,4 +114,13 @@ def main(xml_in, xml_out):
 
 
 if __name__ == "__main__":
-    main( "dblp2.xml", "dblp_g.xml.gz")
+    # sys.argv[1] corresponde ao path para o arquivo de entrada contendo o xml do dblp
+    #
+    # sys.argv[2] corresponde ao path para o arquivo de saida contendo o xml do grafo
+    # do dblp
+    #
+    if len(sys.argv) != 3:
+        print "err: missing params. the program need 2 params."
+    else:
+        main(sys.argv[1], sys.argv[2])
+        # parser.py "dblp2.xml" "dblp_g.xml.gz"

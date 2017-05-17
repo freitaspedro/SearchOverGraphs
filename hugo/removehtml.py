@@ -5,6 +5,7 @@ Esse modulo substitui caracteres especiais em html no xml, e cria uma
 tabela de conversao para esses caracteres.
 '''
 
+import sys
 
 def main(xml_in, xml_out, tabel)
     html = {}
@@ -39,4 +40,16 @@ def main(xml_in, xml_out, tabel)
 
 
 if __name__ == "__main__":
-    main("dblp/dblp.xml", "dblp2.xml", "tabela.txt")
+    # sys.argv[1] corresponde ao path para o arquivo de entrada contendo o xml do dblp
+    #
+    # sys.argv[2] corresponde ao path para o arquivo de saida contendo o xml do dblp sem os
+    # caracteres especiais html
+    #
+    # sys.argv[3] corresponde ao path para o arquivo de saida contendo a tabela de conversao
+    # dos caracteres especiais html
+    #
+    if len(sys.argv) != 4:
+        print "err: missing params. the program need 3 params."
+    else:
+        main(sys.argv[1], sys.argv[2], sys.argv[3])
+        # removehtml.py "dblp/dblp.xml" "dblp2.xml" "tabela.txt"
