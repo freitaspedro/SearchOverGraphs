@@ -8,11 +8,9 @@ indicadora igual a 1 (True)) para todas as buscas
 '''
 
 import pickle
-import os
-import statistics
 import search
 import sys
-import csv
+import numpy as np
 
 def load_list(filename):
     with open(filename, "rb") as fp:
@@ -20,16 +18,12 @@ def load_list(filename):
     return mlist
 
 def save(steps, name, mtype, budgets, time, positives):
+    time_mean = np.mean(time, axis=1)
+    positives_mean = np.mean(positives, axis=1)
+    positives_std = np.std(positives, axis=1)
+    result = np.column_stack((budgets, time_mean, positives_mean, positives_std))
     filename = name+"_"+mtype+".search.csv"
-    if not os.path.isfile(filename):
-        out_csv = csv.writer(open(filename, "wb"))
-        out_csv.writerow(["budget", "time", "positives_mean", "positives_stdev"])
-        for i in xrange(0, steps+1):
-            out_csv.writerow([budgets[i], statistics.mean(time[i]), statistics.mean(positives[i]), statistics.stdev(positives[i])])
-    else:
-        out_csv = csv.writer(open(filename, "a"))
-        for i in xrange(0, steps+1):
-            out_csv.writerow([budgets[i], statistics.mean(time[i]), statistics.mean(positives[i]), statistics.stdev(positives[i])])
+    np.savetxt(filename, result, delimiter=",", header="budget, time, positives_mean, positives_stdev")
     print "%s saved" % filename
 
 def store(steps, j, positives_t, time_t, positives, time):
@@ -39,44 +33,49 @@ def store(steps, j, positives_t, time_t, positives, time):
     return positives_t, time_t
 
 def main(starts_file, neighbours_file, values_file, pt_t, pd_t, ini=1, initial_budget=0, step_size=0, steps=0, runs=0):
+    pt_t = np.float32(pt_t)
+    pd_t = np.float32(pd_t)
+
     neighbours = load_list(neighbours_file)
+    neighbours = np.array([np.array(n, dtype=np.int32) for n in neighbours])
     # print "neighbours", neighbours[:10]
 
     values = load_list(values_file)
+    values = np.array(values, dtype=np.bool_)
     # print "values", values[:10]
 
     starts = load_list(starts_file)
+    starts = np.array(starts, dtype=np.int32)
     # print "starts", starts
 
-    budgets = [0]*(steps+1)
-    for i in xrange(0, steps+1):
-        budgets[i] = initial_budget+i*step_size
+    budgets = np.arange(initial_budget, initial_budget+(steps+1)*step_size, step_size, dtype=np.int32)
     # print "budgets", budgets
 
-    bfs_positives_t, bfs_time_t = [[0]*runs for count in range(steps+1)], [[0]*runs for count in range(steps+1)]
-    dfs_positives_t, dfs_time_t = [[0]*runs for count in range(steps+1)], [[0]*runs for count in range(steps+1)]
-    heu1_positives_t, heu1_time_t = [[0]*runs for count in range(steps+1)], [[0]*runs for count in range(steps+1)]
-    fake_heu1_positives_t, fake_heu1_time_t = [[0]*runs for count in range(steps+1)], [[0]*runs for count in range(steps+1)]
-    dy_heu1_positives_t, dy_heu1_time_t = [[0]*runs for count in range(steps+1)], [[0]*runs for count in range(steps+1)]
-    heu2_positives_t, heu2_time_t = [[0]*runs for count in range(steps+1)], [[0]*runs for count in range(steps+1)]
-    fake_heu2_positives_t, fake_heu2_time_t = [[0]*runs for count in range(steps+1)], [[0]*runs for count in range(steps+1)]
-    dy_heu2_positives_t, dy_heu2_time_t = [[0]*runs for count in range(steps+1)], [[0]*runs for count in range(steps+1)]
-    heu3_positives_t, heu3_time_t = [[0]*runs for count in range(steps+1)], [[0]*runs for count in range(steps+1)]
-    fake_heu3_positives_t, fake_heu3_time_t = [[0]*runs for count in range(steps+1)], [[0]*runs for count in range(steps+1)]
-    dy_heu3_positives_t, dy_heu3_time_t = [[0]*runs for count in range(steps+1)], [[0]*runs for count in range(steps+1)]
-    mod_positives_t, mod_time_t = [[0]*runs for count in range(steps+1)], [[0]*runs for count in range(steps+1)]
+    bfs_positives_t, bfs_time_t = np.zeros((steps+1, runs), dtype=np.int32), np.zeros((steps+1, runs), dtype=np.float16)
+    bfs_positives_t, bfs_time_t = np.zeros((steps+1, runs), dtype=np.int32), np.zeros((steps+1, runs), dtype=np.float16)
+    dfs_positives_t, dfs_time_t = np.zeros((steps+1, runs), dtype=np.int32), np.zeros((steps+1, runs), dtype=np.float16)
+    heu1_positives_t, heu1_time_t = np.zeros((steps+1, runs), dtype=np.int32), np.zeros((steps+1, runs), dtype=np.float16)
+    fake_heu1_positives_t, fake_heu1_time_t = np.zeros((steps+1, runs), dtype=np.int32), np.zeros((steps+1, runs), dtype=np.float16)
+    dy_heu1_positives_t, dy_heu1_time_t = np.zeros((steps+1, runs), dtype=np.int32), np.zeros((steps+1, runs), dtype=np.float16)
+    heu2_positives_t, heu2_time_t = np.zeros((steps+1, runs), dtype=np.int32), np.zeros((steps+1, runs), dtype=np.float16)
+    fake_heu2_positives_t, fake_heu2_time_t = np.zeros((steps+1, runs), dtype=np.int32), np.zeros((steps+1, runs), dtype=np.float16)
+    dy_heu2_positives_t, dy_heu2_time_t = np.zeros((steps+1, runs), dtype=np.int32), np.zeros((steps+1, runs), dtype=np.float16)
+    heu3_positives_t, heu3_time_t = np.zeros((steps+1, runs), dtype=np.int32), np.zeros((steps+1, runs), dtype=np.float16)
+    fake_heu3_positives_t, fake_heu3_time_t = np.zeros((steps+1, runs), dtype=np.int32), np.zeros((steps+1, runs), dtype=np.float16)
+    dy_heu3_positives_t, dy_heu3_time_t = np.zeros((steps+1, runs), dtype=np.int32), np.zeros((steps+1, runs), dtype=np.float16)
+    mod_positives_t, mod_time_t = np.zeros((steps+1, runs), dtype=np.int32), np.zeros((steps+1, runs), dtype=np.float16)
 
-    j = 0
+    j = np.int8(0)
     while j < runs:
         print "round", j
         curr_start = starts[j]
         # print "curr_start", curr_start
 
-        # breadth first search (BFS)
+        # # breadth first search (BFS)
         # bfs_positives, bfs_time = search.breadth_first_search(neighbours, values, 1268107, curr_start, budgets)
         # bfs_positives_t, bfs_time_t = store(steps, j, bfs_positives_t, bfs_time_t, bfs_positives, bfs_time)
 
-        # depth first search (DFS)
+        # # depth first search (DFS)
         # dfs_positives, dfs_time = search.depth_first_search(neighbours, values, 1268107, curr_start, budgets)
         # dfs_positives_t, dfs_time_t = store(steps, j, dfs_positives_t, dfs_time_t, dfs_positives, dfs_time)
 

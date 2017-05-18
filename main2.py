@@ -16,7 +16,6 @@ import statistics
 import search2
 import numpy as np
 import csv
-import os
 
 def initialize_vertices(g, names, f_values, names_in):
     i = 0
@@ -60,15 +59,10 @@ def calculate_edges(g):
 
 def save(steps, name, feat_column, mtype, budgets, sum_time, time, positives_mean, positives_stdev, eplusd_mean, eplusd_stdev):
     filename = name+"_f"+feat_column+"_"+mtype+".search.csv"
-    if not os.path.isfile(filename):
-        out_csv = csv.writer(open(filename, "wb"))
-        out_csv.writerow(["budget", "time", "positives_mean", "positives_stdev", "eplusd_mean", "eplusd_stdev"])
-        for i in xrange(0, steps+1):
-            out_csv.writerow([budgets[i], time[i], positives_mean[i], positives_stdev[i], eplusd_mean[i], eplusd_stdev[i]])
-    else:
-        out_csv = csv.writer(open(filename, "a"))
-        for i in xrange(0, steps+1):
-            out_csv.writerow([budgets[i], time[i], positives_mean[i], positives_stdev[i], eplusd_mean[i], eplusd_stdev[i]])
+    out_csv = csv.writer(open(filename, "wb"))
+    out_csv.writerow(["budget", "time", "positives_mean", "positives_stdev", "eplusd_mean", "eplusd_stdev"])
+    for i in xrange(0, steps+1):
+        out_csv.writerow([budgets[i], time[i], positives_mean[i], positives_stdev[i], eplusd_mean[i], eplusd_stdev[i]])
     print "%s saved" % filename
 
 def update_budgets(runs, steps, positives, eplusd, time, positives_mean, positives_stdev, eplusd_mean, eplusd_stdev, sum_time, time_mean):
