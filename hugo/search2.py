@@ -2,13 +2,12 @@
 
 '''
 Esse modulo contem os tipos de busca sobre grafo (bfs, dfs, busca heuristica e mod) sem o uso
-do graph-tool
+do graph-tool e sem numpy
 '''
 
 import math
 import scipy
 import time
-import numpy as np
 
 MapHeu1 = {}
 MapHeu2 = {}
@@ -20,11 +19,11 @@ MapDyHeu3 = {}
 def breadth_first_search(neighbours, values, num_vertices, start, budgets):
     max_budget = budgets[-1]
     start_time = time.time()
-    positives_t, time_t = np.zeros((max_budget,), dtype=np.int32), np.zeros((max_budget,), dtype=np.float16)
-    status = np.zeros((num_vertices,), dtype=np.bool_)          # status 0 - desconhecido, status 1 - explorado
-    positives = np.int32(0)
+    positives_t, time_t = [0]*max_budget, [0]*max_budget
+    status = [False]*num_vertices          # status 0 - desconhecido, status 1 - explorado
+    positives = 0
     queue = [start]
-    i = np.int32(0)
+    i = 0
     while queue and  i < max_budget:
         start = queue.pop(0)        # retira da fila o vertice mais antigo
         if not status[start]:
@@ -44,11 +43,11 @@ def breadth_first_search(neighbours, values, num_vertices, start, budgets):
 def depth_first_search(neighbours, values, num_vertices, start, budgets):
     max_budget = budgets[-1]
     start_time = time.time()
-    positives_t, time_t = np.zeros((max_budget,), dtype=np.int32), np.zeros((max_budget,), dtype=np.float16)
-    status = np.zeros((num_vertices,), dtype=np.bool_)          # status 0 - desconhecido, status 1 - explorado
-    positives = np.int32(0)
+    positives_t, time_t = [0]*max_budget, [0]*max_budget
+    status = [False]*num_vertices          # status 0 - desconhecido, status 1 - explorado
+    positives = 0
     stack = [start]
-    i = np.int32(0)
+    i = 0
     while stack and  i < max_budget:
         start = stack.pop()        # retira da pilha o vertice mais recente
         if not status[start]:
@@ -68,7 +67,7 @@ def depth_first_search(neighbours, values, num_vertices, start, budgets):
 def p_t_k(k, kt, kn, pt_t, pd_t):
     ini = max(0, k-kn)
     end = min(kt, k)
-    sum_k = np.float64(0)
+    sum_k = 0
     for i in xrange(ini, end):
         sum_k += scipy.special.binom(kt, i) * math.pow(pt_t, i) * math.pow(1-pt_t, kt-i) * scipy.special.binom(kn, k-i) * math.pow(pd_t, k-i) \
         * math.pow(1-pd_t, kn-k+i)
@@ -78,13 +77,13 @@ def heuristic(pt_t, pd_t, kt, kn, mtype):
     if mtype == 1:                  # ideia 1 - ocorrer em todas as arestas
         if (kt, kn) in MapHeu1:
             return MapHeu1[(kt, kn)]
-        pfor = np.float64(math.pow(pt_t, kt) * math.pow(pd_t, kn))
+        pfor = math.pow(pt_t, kt) * math.pow(pd_t, kn)
         MapHeu1[(kt, kn)] = pfor
         return pfor
     elif mtype == 2:                # ideia 2 - ocorrer na maioria das arestas
         if (kt, kn) in MapHeu2:
             return MapHeu2[(kt, kn)]
-        pm = np.float64(0)
+        pm = 0
         ini = int(math.ceil((kt+kn)/2.0))
         end = kt+kn
         for i in xrange(ini, end):
@@ -94,7 +93,7 @@ def heuristic(pt_t, pd_t, kt, kn, mtype):
     elif mtype == 3:                # ideia 3 - ocorre em pelo menos uma aresta
         if (kt, kn) in MapHeu3:
             return MapHeu3[(kt, kn)]
-        pfra = np.float64(1 - math.pow(1-pt_t, kt) * math.pow(1-pd_t, kn))
+        pfra = 1 - math.pow(1-pt_t, kt) * math.pow(1-pd_t, kn)
         MapHeu3[(kt, kn)] = pfra
         return pfra
 
@@ -102,13 +101,13 @@ def dyheuristic(pt_t, pd_t, kt, kn, mtype):
     if mtype == 1:                  # ideia 1 - ocorrer em todas as arestas
         if (pt_t, pd_t, kt, kn) in MapDyHeu1:
             return MapDyHeu1[(pt_t, pd_t, kt, kn)]
-        pfor = np.float64(math.pow(pt_t, kt) * math.pow(pd_t, kn))
+        pfor = math.pow(pt_t, kt) * math.pow(pd_t, kn)
         MapDyHeu1[(pt_t, pd_t, kt, kn)] = pfor
         return pfor
     elif mtype == 2:                # ideia 2 - ocorrer na maioria das arestas
         if (pt_t, pd_t, kt, kn) in MapDyHeu2:
             return MapDyHeu2[(pt_t, pd_t, kt, kn)]
-        pm = np.float64(0)
+        pm = 0
         ini = int(math.ceil((kt+kn)/2.0))
         end = kt+kn
         for i in xrange(ini, end):
@@ -118,21 +117,21 @@ def dyheuristic(pt_t, pd_t, kt, kn, mtype):
     elif mtype == 3:                # ideia 3 - ocorre em pelo menos uma aresta
         if (pt_t, pd_t, kt, kn) in MapDyHeu3:
             return MapDyHeu3[(pt_t, pd_t, kt, kn)]
-        pfra = np.float64(1 - math.pow(1-pt_t, kt) * math.pow(1-pd_t, kn))
+        pfra = 1 - math.pow(1-pt_t, kt) * math.pow(1-pd_t, kn)
         MapDyHeu3[(pt_t, pd_t, kt, kn)] = pfra
         return pfra
 
 def heu_search(neighbours, values, num_vertices, start, budgets, pt_t, pd_t, mtype):
     max_budget = budgets[-1]
     start_time = time.time()
-    positives_t, time_t = np.zeros((max_budget,), dtype=np.int32), np.zeros((max_budget,), dtype=np.float16)
-    kt_values = np.zeros((num_vertices,), dtype=np.int16)
-    kn_values = np.zeros((num_vertices,), dtype=np.int16)
+    positives_t, time_t =  [0]*max_budget, [0]*max_budget
+    kt_values = [0]*num_vertices
+    kn_values = [0]*num_vertices
     heu_values = {}
-    status = np.zeros((num_vertices,), dtype=np.int8)          # status 0 - desconhecido, status 1 - descoberto, status 2 - explorado
-    positives = np.int32(0)
+    status = [0]*num_vertices             # status 0 - desconhecido, status 1 - descoberto, status 2 - explorado
+    positives = 0
     status[start] = 2
-    i = np.int32(0)
+    i = 0
     while i < max_budget:
         if values[start]:          # ao explorar o vertice constata que ele tem a caracteristica
             positives += 1
@@ -162,18 +161,18 @@ def heu_search(neighbours, values, num_vertices, start, budgets, pt_t, pd_t, mty
 def dy_heu_search(neighbours, values, num_vertices, start, budgets, ini, mtype):
     max_budget = budgets[-1]
     start_time = time.time()
-    positives_t, time_t = np.zeros((max_budget,), dtype=np.int32), np.zeros((max_budget,), dtype=np.float16)
-    kt_values = np.zeros((num_vertices,), dtype=np.int16)
-    kn_values = np.zeros((num_vertices,), dtype=np.int16)
+    positives_t, time_t = [0]*max_budget, [0]*max_budget
+    kt_values = [0]*num_vertices
+    kn_values = [0]*num_vertices
     heu_values = {}
-    status = np.zeros((num_vertices,), dtype=np.int8)          # status 0 - desconhecido, status 1 - descoberto, status 2 - explorado
-    positives = np.int32(0)
+    status = [0]*num_vertices          # status 0 - desconhecido, status 1 - descoberto, status 2 - explorado
+    positives = 0
     status[start] = 2
     # nt - num de arestas 't'-'t', nd - num de arestas 't'-'n', nn - num de arestas 'n'-'n'
-    nt, nd, nn = np.int32(ini), np.int32(ini), np.int32(ini)
+    nt, nd, nn = ini, ini, ini
     pt_t = nt/float(nt+nd)                  # calculo dinamico de pt_t e pd_t
     pd_t = nd/float(nd+nn)
-    i = np.int32(0)
+    i = 0
     while i < max_budget:
         if not i % 100:            # condicao de atualizacao de pt_t e pd_t
             pt_t = nt/float(nt+nn)                  # calculo dinamico de pt_t e pd_t
@@ -216,14 +215,14 @@ def dy_heu_search(neighbours, values, num_vertices, start, budgets, ini, mtype):
 def mod(neighbours, values, num_vertices, start, budgets):
     max_budget = budgets[-1]
     start_time = time.time()
-    positives_t, time_t = np.zeros((max_budget,), dtype=np.int32), np.zeros((max_budget,), dtype=np.float16)
+    positives_t, time_t = [0]*max_budget, [0]*max_budget
 
     ktv = dict.fromkeys(range(num_vertices), 1)
     kt_values = {}
-    status = np.zeros((num_vertices,), dtype=np.int8)          # status 0 - desconhecido, status 1 - descoberto, status 2 - explorado
-    positives = np.int32(0)
+    status = [0]*num_vertices           # status 0 - desconhecido, status 1 - descoberto, status 2 - explorado
+    positives = 0
     status[start] = 2
-    i = np.int32(0)
+    i = 0
     while i < max_budget:
         if values[start]:          # ao explorar o vertice constata que ele tem a caracteristica
             positives += 1

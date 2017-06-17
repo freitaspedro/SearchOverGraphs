@@ -9,6 +9,11 @@ import graph_tool.all as gt
 import statistics
 from collections import Counter
 
+IdInDegree = []
+IdOutDegree = []
+InDegree = []
+OutDegree = []
+
 def get_name(name):
     return "graph '%s'\n" % name
 
@@ -26,21 +31,21 @@ def get_diameter(g):
     return "pseudo_diameter %s (source %s, target %s)\n" % (dist, ends[0], ends[1])
 
 def get_degrees(g):
-    out_degree = []
-    in_degree = []
     for v in g.vertices():
-        out_degree.append(v.out_degree())
-        in_degree.append(v.in_degree())
-    return out_degree, in_degree
+        IdInDegree.append((int(v), g.vp.name[v], v.in_degree()))
+        IdOutDegree.append((int(v), g.vp.name[v], v.out_degree()))
+        InDegree.append(v.in_degree())
+        OutDegree.append(v.out_degree())
 
 def get_avg_degrees(g):
-    out_degree, in_degree = get_degrees(g)
-    return "avg_in_degree %s (std %s)\navg_out_degree %s (std %s)\n" % (statistics.mean(in_degree),
-        statistics.pstdev(in_degree), statistics.mean(out_degree), statistics.pstdev(out_degree))
+    get_degrees(g)
+    return "max_in_degree %s\nmin_in_degree %s\navg_in_degree %s (std %s)\n" \
+                "max_out_degree %s\nmin_out_degree %s\navg_out_degree %s (std %s)\n" \
+                % (max(InDegree), min(InDegree), statistics.mean(InDegree), statistics.pstdev(InDegree),
+                    max(OutDegree), min(OutDegree), statistics.mean(OutDegree), statistics.pstdev(OutDegree))
 
 def get_degree_dist(g):
-    out_degree, in_degree = get_degrees(g)
-    return dict(Counter(out_degree)), dict(Counter(in_degree))
+    return dict(Counter(InDegree)), dict(Counter(OutDegree))
 
 def get_global_clustering(g):
     return "global_clustering %s (std %s)\n" % (gt.global_clustering(g))
@@ -53,6 +58,11 @@ def get_comps(g, directed):
         relative_size = v/float(g.num_vertices())
         resp.append("comp %s size %s (%s percent)\n" % (k, v, 100*relative_size))
     return "".join(resp)
+
+def topn_lastn_degrees(g, n):
+    sorted_IdInDegree = sorted(IdInDegree, key=lambda tup: tup[2], reverse=True)
+    sorted_IdOutDegree = sorted(IdOutDegree, key=lambda tup: tup[2], reverse=True)
+    return sorted_IdInDegree[:n], sorted_IdInDegree[-n:], sorted_IdOutDegree[:n], sorted_IdOutDegree[-n:]
 
 def get_all_names(g):
     names = []

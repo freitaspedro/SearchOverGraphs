@@ -84,7 +84,9 @@ def breadth_first_search2(g, start, budgets, num_vertices):
         if status[int(start)] == 0:
             if int(g.vp.value[start]) == 1:
                 positives += 1
-            queue.extend(list(start.out_neighbours()))      # poe na fila os vizinhos do vertice explorado
+            for n in start.out_neighbours():
+                if status[int(n)] == 0:
+                    queue.append(n)      # poe na fila os vizinhos desconhecidos do vertice explorado
             status[int(start)] = 1
             positives_t[i] = positives
             time_t[i] = time.time() - start_time
@@ -107,7 +109,9 @@ def depth_first_search2(g, start, budgets, num_vertices):
         if status[int(start)] == 0:
             if int(g.vp.value[start]) == 1:
                 positives += 1
-            stack.extend(list(start.out_neighbours()))      # poe na pilha os vizinhos do vertice explorado
+            for n in start.out_neighbours():
+                if status[int(n)] == 0:
+                    stack.append(n)      # poe na fila os vizinhos desconhecidos do vertice explorado
             status[int(start)] = 1
             positives_t[i] = positives
             time_t[i] = time.time() - start_time
@@ -216,8 +220,9 @@ def dy_heu_search(g, num_vertices, start, budgets, ini, mtype):
     i = 0
     # print "max_budget", max_budget
     while i < max_budget:
-        pt_t = nt/float(nt+nn)                  # calculo dinamico de pt_t e pd_t
-        pd_t = nd/float(nt+nd)
+        if not i % 100:            # condicao de atualizacao de pt_t e pd_t
+            pt_t = nt/float(nt+nd)                  # calculo dinamico de pt_t e pd_t
+            pd_t = nd/float(nd+nn)
         # print "pt_t", pt_t
         # print "pd_t", pd_t
         # print "start", start

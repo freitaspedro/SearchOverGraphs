@@ -39,7 +39,7 @@ def main(xml_in, xml_out):
 
     pubs = set([u"inproceedings"])            # tipos de publicacao validas
     ways = [u"conf"]            # meios de publicacao validos
-    inval = set([u"et al.", u"anonymous", u"None"])          # nomes de autor invalidos
+    inval = set([u"et al.", u"anonymous", None])          # nomes de autor invalidos
 
     author_conf = {}
     author_author = []
@@ -50,12 +50,14 @@ def main(xml_in, xml_out):
             att = el.get("key")
             # OBS: <article mdate="2012-05-29" key="journals/ijcaet/SinghP09">
             # meio = journals, nome = ijcaet
-            if att != None:
+            if att is not None:
                 w = att.split("/")[0]
                 if w in ways:
                     c = att.split("/")[1]
                     authors = [j.text for j in el.findall("author") if j.text not in inval]               # pega os autores da publicacao
                     for author in authors:
+                        # if author is None:
+                        #     print "err 1: author is %s" % author
                         author_conf.setdefault(author, []).append(c)
                     author_author.extend([t for t in itools.combinations(authors, 2)])
         el.clear()                 # importante, limpa a memoria
@@ -66,9 +68,11 @@ def main(xml_in, xml_out):
 
     author_author = remove_dup(author_author)
     # for k, v in author_conf.iteritems():
-    #     print k, v
+    #     if k is None:
+    #         print "err 2: author is %s" % k
     # for v in author_author:
-    #     print v
+    #     if v[0] is None or v[1] is None:
+    #         print "err 3: some author is None (%s or %s)" % (v[0], v[1])
 
     print "building graph..."
     g = gt.Graph(directed=False)

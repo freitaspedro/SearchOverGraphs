@@ -113,6 +113,14 @@ def calculate_edges(graph):
     print "pt_t:", pt_t
     print "pd_t:", pd_t
 
+def get_positive_subgraph(graph, exit):
+    g = gt.load_graph(graph)
+    u = gt.GraphView(g, vfilt=lambda v: g.vp.value[v] == 1)
+    print "%s vertices" % u.num_vertices()
+    print "%s edges" % u.num_edges()
+    u.save(exit)
+    print "%s saved" % exit
+
 def get_starts(graph, n):
     g = gt.load_graph(graph)
     ids = []
@@ -120,27 +128,32 @@ def get_starts(graph, n):
         ids.append(int(v))
     starts = random.sample(ids, n)  # sorteia aleatoriamento n vertices
     # print "starts", starts
-    with open("starts.txt", "wb") as fp:
-        pickle.dump(starts, fp)
-    print "starts.txt saved"
+    with open("starts", "wb") as f:
+        for item in starts:
+            f.write("%s\n" % item)
+    print "starts saved"
 
 def graph_to_list(graph):
     g = gt.load_graph(graph)
-    neighbours = [[1268108] for count in range(1268107)]     # todos os vertices comecam tendo um vizinho que nao existe
+    neighbours = [[1268108] for count in range(1268106)]     # todos os vertices comecam tendo um vizinho que nao existe
     for v in g.vertices():
         neighbours[int(v)] = [int(n) for n in v.out_neighbours()]
     filename = graph[:graph.find(".")]
-    with open(filename, "wb") as fp:
-        pickle.dump(neighbours, fp)
+    with open(filename, "wb") as f:
+        for item in neighbours:
+            f.write("%s\n" % item)
+    print "%s saved" % filename
 
 def graph_values_to_list(graph):
     g = gt.load_graph(graph)
-    values = [False]*1268107      # todos os vertices comecam tendo valor 'false'
+    values = [False]*1268106      # todos os vertices comecam tendo valor 'false'
     for v in g.vertices():
         values[int(v)] = bool(g.vp.value[v])
     filename = graph[:graph.find(".")]
-    with open(filename, "wb") as fp:
-        pickle.dump(values, fp)
+    with open(filename, "wb") as f:
+        for item in values:
+            f.write("%s\n" % item)
+    print "%s saved" % filename
 
 
 if __name__ == "__main__":
@@ -165,6 +178,9 @@ if __name__ == "__main__":
         # compact.py 3 "gcc_dblp_g.xml.gz" "textgraphs"
         # compact.py 3 "gcc_dblp_g.xml.gz" "p2p"
         # compact.py 3 "gcc_dblp_g.xml.gz" "wcnc"
+        # compact.py 3 "gcc_dblp_g.xml.gz" "immerscom"
+        # compact.py 3 "gcc_dblp_g.xml.gz" "socialcom"
+        # compact.py 3 "gcc_dblp_g.xml.gz" "aaai"
     elif mtype == 4:
         set_values2(sys.argv[2], ast.literal_eval(sys.argv[3]), sys.argv[4])
         # compact.py 4 "gcc_dblp_g.xml.gz" "['icassp', 'icip', 'icmcs', 'interspeech', 'hci', 'chi', 'siggraph']" "group1"
@@ -176,9 +192,12 @@ if __name__ == "__main__":
         # compact.py 5 "wcnc/wcnc_gcc_dblp_g.xml.gz"
         # compact.py 5 "group1/group1_gcc_dblp_g.xml.gz"
         # compact.py 5 "group2/group2_gcc_dblp_g.xml.gz"
+        # compact.py 5 "immerscom/immerscom_gcc_dblp_g.xml.gz"
+        # compact.py 5 "socialcom/socialcom_gcc_dblp_g.xml.gz"
+        # compact.py 5 "aaai/aaai_gcc_dblp_g.xml.gz"
     elif mtype == 6:
         get_starts(sys.argv[2], int(sys.argv[3]))
-        # compact.py 6 "gcc_dblp_g.xml.gz" 20
+        # compact.py 6 "gcc_dblp_g.xml.gz" 50
     elif mtype == 7:
         graph_to_list(sys.argv[2])
         # compact.py 7 "gcc_dblp_g.xml.gz"
@@ -189,3 +208,16 @@ if __name__ == "__main__":
         # compact.py 8 "wcnc/wcnc_gcc_dblp_g.xml.gz"
         # compact.py 8 "group1/group1_gcc_dblp_g.xml.gz"
         # compact.py 8 "group2/group2_gcc_dblp_g.xml.gz"
+        # compact.py 8 "immerscom/immerscom_gcc_dblp_g.xml.gz"
+        # compact.py 8 "socialcom/socialcom_gcc_dblp_g.xml.gz"
+        # compact.py 8 "aaai/aaai_gcc_dblp_g.xml.gz"
+    elif mtype == 9:
+        get_positive_subgraph(sys.argv[2], sys.argv[3])
+        # compact.py 9 "textgraphs/textgraphs_gcc_dblp_g.xml.gz" "textgraphs/positives_textgraphs_gcc_dblp_g.xml.gz"
+        # compact.py 9 "p2p/p2p_gcc_dblp_g.xml.gz" "p2p/positives_p2p_gcc_dblp_g.xml.gz"
+        # compact.py 9 "wcnc/wcnc_gcc_dblp_g.xml.gz" "wcnc/positives_wcnc_gcc_dblp_g.xml.gz"
+        # compact.py 9 "group1/group1_gcc_dblp_g.xml.gz" "group1/positives_group1_gcc_dblp_g.xml.gz"
+        # compact.py 9 "group2/group2_gcc_dblp_g.xml.gz" "group2/positives_group2_gcc_dblp_g.xml.gz"
+        # compact.py 9 "immerscom/immerscom_gcc_dblp_g.xml.gz" "immerscom/positives_immerscom_gcc_dblp_g.xml.gz"
+        # compact.py 9 "socialcom/socialcom_gcc_dblp_g.xml.gz" "socialcom/positives_socialcom_gcc_dblp_g.xml.gz"
+        # compact.py 9 "aaai/aaai_gcc_dblp_g.xml.gz" "aaai/positives_aaai_gcc_dblp_g.xml.gz"
