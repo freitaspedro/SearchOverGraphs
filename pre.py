@@ -118,6 +118,8 @@ if __name__ == "__main__":
     # main("hugo/dblp_g.xml.gz", -1, False)
     # main("hugo/gcc_dblp_g.xml.gz", -1, False)
 
+    ################### pos wperformance ################################
+
     # main("hugo/textgraphs/positives_textgraphs_gcc_dblp_g.xml.gz", -1, False)
     # main("hugo/p2p/positives_p2p_gcc_dblp_g.xml.gz", -1, False)
     # main("hugo/wcnc/positives_wcnc_gcc_dblp_g.xml.gz", -1, False)
@@ -125,4 +127,8 @@ if __name__ == "__main__":
     # main("hugo/group2/positives_group2_gcc_dblp_g.xml.gz", -1, False)
     # main("hugo/immerscom/positives_immerscom_gcc_dblp_g.xml.gz", -1, False)
     # main("hugo/socialcom/positives_socialcom_gcc_dblp_g.xml.gz", -1, False)
-    main("hugo/aaai/positives_aaai_gcc_dblp_g.xml.gz", -1, False)
+    # main("hugo/aaai/positives_aaai_gcc_dblp_g.xml.gz", -1, False)
+
+    # main("snap/facebook/1912/f240/gcc.xml.gz", -1, False)
+    # main("snap/gplus/116807883656585676940/f862/gcc.xml.gz", -1, False)
+    main("uci/polblogs/polblogs.gcc.xml.gz", -1, False)
