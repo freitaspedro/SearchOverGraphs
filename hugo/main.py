@@ -72,17 +72,17 @@ def main(starts_file, neighbours_file, values_file, pt_t, pd_t, ini=1, initial_b
         curr_start = starts[j]
         # print "curr_start", curr_start
 
-        # # breadth first search (BFS)
-        # bfs_positives, bfs_time = search.breadth_first_search(neighbours, values, 1268106, curr_start, budgets)
-        # bfs_positives_t, bfs_time_t = store(steps, j, bfs_positives_t, bfs_time_t, bfs_positives, bfs_time)
+        # breadth first search (BFS)
+        bfs_positives, bfs_time = search.breadth_first_search(neighbours, values, 1268106, curr_start, budgets)
+        bfs_positives_t, bfs_time_t = store(steps, j, bfs_positives_t, bfs_time_t, bfs_positives, bfs_time)
 
-        # # depth first search (DFS)
-        # dfs_positives, dfs_time = search.depth_first_search(neighbours, values, 1268106, curr_start, budgets)
-        # dfs_positives_t, dfs_time_t = store(steps, j, dfs_positives_t, dfs_time_t, dfs_positives, dfs_time)
+        # depth first search (DFS)
+        dfs_positives, dfs_time = search.depth_first_search(neighbours, values, 1268106, curr_start, budgets)
+        dfs_positives_t, dfs_time_t = store(steps, j, dfs_positives_t, dfs_time_t, dfs_positives, dfs_time)
 
-        # # ideia 1 - ocorrer em todas as arestas
-        # heu1_positives, heu1_time = search.heu_search(neighbours, values, 1268106, curr_start, budgets, pt_t, pd_t, 1)
-        # heu1_positives_t, heu1_time_t = store(steps, j, heu1_positives_t, heu1_time_t, heu1_positives, heu1_time)
+        # ideia 1 - ocorrer em todas as arestas
+        heu1_positives, heu1_time = search.heu_search(neighbours, values, 1268106, curr_start, budgets, pt_t, pd_t, 1)
+        heu1_positives_t, heu1_time_t = store(steps, j, heu1_positives_t, heu1_time_t, heu1_positives, heu1_time)
 
         # # ideia 1.a - ocorrer na maioria das arestas com pt_t e pd_t obtido a partir do valor fictico 1/3 para pt, pd e pn
         # fake_heu1_positives, fake_heu1_time = search.heu_search(neighbours, values, 1268106, curr_start, budgets, 0.5, 0.5, 1)
@@ -93,9 +93,9 @@ def main(starts_file, neighbours_file, values_file, pt_t, pd_t, ini=1, initial_b
         # dy_heu1_positives, dy_heu1_time = search.dy_heu_search(neighbours, values, 1268106, curr_start, budgets, ini, 1)
         # dy_heu1_positives_t, dy_heu1_time_t = store(steps, j, dy_heu1_positives_t, dy_heu1_time_t, dy_heu1_positives, dy_heu1_time)
 
-        # # ideia 2 - ocorrer na maioria das arestas
-        # heu2_positives, heu2_time = search.heu_search(neighbours, values, 1268106, curr_start, budgets, pt_t, pd_t, 2)
-        # heu2_positives_t, heu2_time_t = store(steps, j, heu2_positives_t, heu2_time_t, heu2_positives, heu2_time)
+        # ideia 2 - ocorrer na maioria das arestas
+        heu2_positives, heu2_time = search.heu_search(neighbours, values, 1268106, curr_start, budgets, pt_t, pd_t, 2)
+        heu2_positives_t, heu2_time_t = store(steps, j, heu2_positives_t, heu2_time_t, heu2_positives, heu2_time)
 
         # # ideia 2.a - ocorrer na maioria das arestas com pt_t e pd_t obtido a partir do valor fictico 1/3 para pt, pd e pn
         # fake_heu2_positives, fake_heu2_time = search.heu_search(neighbours, values, 1268106, curr_start, budgets, 0.5, 0.5, 2)
@@ -106,37 +106,37 @@ def main(starts_file, neighbours_file, values_file, pt_t, pd_t, ini=1, initial_b
         # dy_heu2_positives, dy_heu2_time = search.dy_heu_search(neighbours, values, 1268106, curr_start, budgets, ini, 2)
         # dy_heu2_positives_t, dy_heu2_time_t = store(steps, j, dy_heu2_positives_t, dy_heu2_time_t, dy_heu2_positives, dy_heu2_time)
 
-        # # ideia 3 - ocorrer em pelo menos uma aresta
-        # heu3_positives, heu3_time = search.heu_search(neighbours, values, 1268106, curr_start, budgets, pt_t, pd_t, 3)
-        # heu3_positives_t, heu3_time_t = store(steps, j, heu3_positives_t, heu3_time_t, heu3_positives, heu3_time)
+        # ideia 3 - ocorrer em pelo menos uma aresta
+        heu3_positives, heu3_time = search.heu_search(neighbours, values, 1268106, curr_start, budgets, pt_t, pd_t, 3)
+        heu3_positives_t, heu3_time_t = store(steps, j, heu3_positives_t, heu3_time_t, heu3_positives, heu3_time)
 
         # # ideia 3.a - ocorrer na maioria das arestas com pt_t e pd_t obtido a partir do valor fictico 1/3 para pt, pd e pn
         # fake_heu3_positives, fake_heu3_time = search.heu_search(neighbours, values, 1268106, curr_start, budgets, 0.5, 0.5, 3)
         # fake_heu3_positives_t, fake_heu3_time_t = store(steps, j, fake_heu3_positives_t, fake_heu3_time_t, \
         # fake_heu3_positives, fake_heu3_time)
 
-        # ideia 3.b - ocorrer na maioria das arestas com pt_t e pd_t dinamicos
-        dy_heu3_positives, dy_heu3_time = search.dy_heu_search(neighbours, values, 1268106, curr_start, budgets, ini, 3)
-        dy_heu3_positives_t, dy_heu3_time_t = store(steps, j, dy_heu3_positives_t, dy_heu3_time_t, dy_heu3_positives, dy_heu3_time)
+        # # ideia 3.b - ocorrer na maioria das arestas com pt_t e pd_t dinamicos
+        # dy_heu3_positives, dy_heu3_time = search.dy_heu_search(neighbours, values, 1268106, curr_start, budgets, ini, 3)
+        # dy_heu3_positives_t, dy_heu3_time_t = store(steps, j, dy_heu3_positives_t, dy_heu3_time_t, dy_heu3_positives, dy_heu3_time)
 
-        # # maximum observed degree (mod adaptado)
-        # mod_positives, mod_time = search.mod(neighbours, values, 1268106, curr_start, budgets)
-        # mod_positives_t, mod_time_t = store(steps, j, mod_positives_t, mod_time_t, mod_positives, mod_time)
+        # maximum observed degree (mod adaptado)
+        mod_positives, mod_time = search.mod(neighbours, values, 1268106, curr_start, budgets)
+        mod_positives_t, mod_time_t = store(steps, j, mod_positives_t, mod_time_t, mod_positives, mod_time)
         j += 1
 
     name =  values_file[:values_file.find("_")]
-    # save(steps, name, "BFS", budgets, bfs_time_t, bfs_positives_t)
-    # save(steps, name, "DFS", budgets, dfs_time_t, dfs_positives_t)
-    # save(steps, name, "HEU1", budgets, heu1_time_t, heu1_positives_t)
+    save(steps, name, "BFS", budgets, bfs_time_t, bfs_positives_t)
+    save(steps, name, "DFS", budgets, dfs_time_t, dfs_positives_t)
+    save(steps, name, "HEU1", budgets, heu1_time_t, heu1_positives_t)
     # save(steps, name, "fakeHEU1", budgets, fake_heu1_time_t, fake_heu1_positives_t)
     # save(steps, name, "dyHEU1", budgets, dy_heu1_time_t, dy_heu1_positives_t)
-    # save(steps, name, "HEU2", budgets, heu2_time_t, heu2_positives_t)
+    save(steps, name, "HEU2", budgets, heu2_time_t, heu2_positives_t)
     # save(steps, name, "fakeHEU2", budgets, fake_heu2_time_t, fake_heu2_positives_t)
     # save(steps, name, "dyHEU2", budgets, dy_heu2_time_t, dy_heu2_positives_t)
-    # save(steps, name, "HEU3", budgets, heu3_time_t, heu3_positives_t)
+    save(steps, name, "HEU3", budgets, heu3_time_t, heu3_positives_t)
     # save(steps, name, "fakeHEU3", budgets, fake_heu3_time_t, fake_heu3_positives_t)
-    save(steps, name, "dyHEU3", budgets, dy_heu3_time_t, dy_heu3_positives_t)
-    # save(steps, name, "MODs", budgets, mod_time_t, mod_positives_t)
+    # save(steps, name, "dyHEU3", budgets, dy_heu3_time_t, dy_heu3_positives_t)
+    save(steps, name, "MODs", budgets, mod_time_t, mod_positives_t)
 
 
 if __name__ == "__main__":

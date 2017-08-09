@@ -1,0 +1,37 @@
+##### .01%
+feat textgraphs - 18 positives (0.0284468044756 percent) pt: 1.9528198719e-05 pd: 0.000800656147477 pn: 0.999179815654
+pt_t: 1.95438466199e-05 pd_t: 0.97619047619
+
+
+##### .1%
+feat p2p - 135 positives (0.213351033567 percent) pt: 0.000800656147477 pd: 0.0118829089205 pn: 0.987316434932
+pt_t: 0.000810284686608 pd_t: 0.936874518861
+
+
+##### 1%
+feat wcnc - 1483 positives (2.34370061319 percent) pt: 0.0173703327605 pd: 0.0968696297454 pn: 0.885760037494
+pt_t: 0.0192334720796 pd_t: 0.847948717949
+
+
+##### 10%
+###group 1
+feat icassp - 3120 positives (4.93077944244 percent) +
+feat icip - 2433 positives (3.84505973829 percent) +
+feat icmcs - 1632 positives (2.57917693912 percent) +
+feat interspeech - 1530 positives (2.41797838043 percent) +
+feat hci - 1657 positives (2.61868638978 percent) +
+feat chi - 1764 positives (2.78778683861 percent) +
+feat siggraph - 1062 positives (1.67836146406 percent)
+###feat ['icassp', 'icip', 'icmcs', 'interspeech', 'hci', 'chi', 'siggraph'] - 9767 positives (15.4355521841 percent)
+pt: 0.135447586315 pd: 0.279028667396 pn: 0.58552374629 pt_t: 0.187868199732 pd_t: 0.673207849419
+
+
+###group 2
+feat iscas - 2174 positives (3.43574182945 percent) +
+feat icra - 2124 positives (3.35672292812 percent) +
+feat iros - 2131 positives (3.36778557431 percent) +
+feat smc - 1528 positives (2.41481762438 percent) +
+feat vtc - 1849 positives (2.92211897086 percent) +
+feat eusipco - 1248 positives (1.97231177698 percent)
+###feat ['iscas', 'icra', 'iros', 'smc', 'vtc', 'eusipco'] - 8757 positives (13.8393703774 percent)
+pt: 0.112765583503 pd: 0.266999296985 pn: 0.620235119513 pt_t: 0.153841030491 pd_t: 0.703064740063
