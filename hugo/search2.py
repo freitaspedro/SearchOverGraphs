@@ -6,7 +6,7 @@ do graph-tool e sem numpy
 '''
 
 import math
-import scipy
+import scipy.special as sp
 import time
 
 MapHeu1 = {}
@@ -69,8 +69,7 @@ def p_t_k(k, kt, kn, pt_t, pd_t):
     end = min(kt, k)
     sum_k = 0
     for i in xrange(ini, end):
-        sum_k += scipy.special.binom(kt, i) * math.pow(pt_t, i) * math.pow(1-pt_t, kt-i) * scipy.special.binom(kn, k-i) * math.pow(pd_t, k-i) \
-        * math.pow(1-pd_t, kn-k+i)
+        sum_k += sp.binom(kt, i) * math.pow(pt_t, i) * math.pow(1-pt_t, kt-i) * sp.binom(kn, k-i) * math.pow(pd_t, k-i) * math.pow(1-pd_t, kn-k+i)
     return sum_k
 
 def heuristic(pt_t, pd_t, kt, kn, mtype):
@@ -174,7 +173,7 @@ def dy_heu_search(neighbours, values, num_vertices, start, budgets, ini, mtype):
     pd_t = nd/float(nd+nn)
     i = 0
     while i < max_budget:
-        if not i % 100:            # condicao de atualizacao de pt_t e pd_t
+        if not i % 1:            # condicao de atualizacao de pt_t e pd_t
             pt_t = nt/float(nt+nn)                  # calculo dinamico de pt_t e pd_t
             pd_t = nd/float(nt+nd)
         value_start = values[start]

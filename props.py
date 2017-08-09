@@ -33,7 +33,9 @@ def get_diameter(g):
 def get_degrees(g):
     for v in g.vertices():
         IdInDegree.append((int(v), g.vp.name[v], v.in_degree()))
+        # IdInDegree.append((int(v), g.vp.label[v], v.in_degree()))       # polblogs
         IdOutDegree.append((int(v), g.vp.name[v], v.out_degree()))
+        # IdOutDegree.append((int(v), g.vp.label[v], v.out_degree()))     # polblogs
         InDegree.append(v.in_degree())
         OutDegree.append(v.out_degree())
 

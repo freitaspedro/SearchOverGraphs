@@ -220,7 +220,7 @@ if __name__ == "__main__":
     # - pt_t: 0.0360402443406 pd_t: 0.686170212766
     # main4.py "starts_fb" "snap/facebook/1912/neighbours" "snap/facebook/1912/f91/values" 0.0360402443406 0.686170212766 747 20 20 16 20
 
-    # feat 240 - feat 240 - 139 positives (18.6827956989 percent) - pt: 0.0446990640509 pd: 0.310728441528 pn: 0.644572494421
+    # feat 240 - 139 positives (18.6827956989 percent) - pt: 0.0446990640509 pd: 0.310728441528 pn: 0.644572494421
     # - pt_t: 0.0648497148932 pd_t: 0.874238590573
     # main4.py "starts_fb" "snap/facebook/1912/neighbours" "snap/facebook/1912/f240/values" 0.0648497148932 0.874238590573 747 20 20 16 20
 
@@ -249,10 +249,10 @@ if __name__ == "__main__":
 
     ###########################################################################
     # 1490 vertices     19090 edges
-    # 793 vertices      15841 edges
-    # A - feat -1 - 442 positives (55.737704918 percent) - pt: 0.478442017549 pd: 0.0787197777918 pn: 0.442838204659
-    # - pt_t: 0.519323009456 pd_t: 0.141287106277
+    # 1222 vertices     19089 edges
+    # feat -1 - 636 positives (52.0458265139 percent) - pt: 0.471161401854 pd: 0.0884278904081 pn: 0.440410707737
+    # - pt_t: 0.516866846733 pd_t: 0.158022842164
     # budget 50 - 750 (50)
-    # main4.py "starts_polblogs" "uci/polblogs/neighbours" "uci/polblogs/values" 0.519323009456 0.141287106277 1490 50 50 14 20
+    # main4.py "starts_polblogs" "uci/polblogs/neighbours" "uci/polblogs/values" 0.516866846733 0.158022842164 1490 50 50 14 20
 
 

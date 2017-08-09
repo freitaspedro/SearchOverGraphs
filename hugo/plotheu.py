@@ -6,72 +6,67 @@ Esse modulo plota o grafico orcamento x vertices positivos para todas as buscas 
 
 import matplotlib.pyplot as plt
 import numpy as np
+import sys
 
-def main(file_heu1, file_heu2, file_heu3, file_fakeheu1, file_fakeheu2, file_fakeheu3,
-    file_dyheu1, file_dyheu2, file_dyheu3, exit_file):
+def main(heu, file_heu, file_fakeheu, file_dy1heu, file_dy10heu, file_dy100heu, exit_file, bar):
 
-    budget, time, heu1_positives_mean, heu1_positives_stdev = np.loadtxt(file_heu1, delimiter=",", unpack=True)
-    heu2b, heu2t, heu2_positives_mean, heu2_positives_stdev = np.loadtxt(file_heu2, delimiter=",", unpack=True)
-    heu3b, heu3t, heu3_positives_mean, heu3_positives_stdev = np.loadtxt(file_heu3, delimiter=",", unpack=True)
-    fakeheu1b, fakeheu1t, fakeheu1_positives_mean, fakeheu1_positives_stdev = np.loadtxt(file_fakeheu1, delimiter=",", unpack=True)
-    fakeheu2b, fakeheu2t, fakeheu2_positives_mean, fakeheu2_positives_stdev = np.loadtxt(file_fakeheu2, delimiter=",", unpack=True)
-    fakeheu3b, fakeheu3t, fakeheu3_positives_mean, fakeheu3_positives_stdev = np.loadtxt(file_fakeheu3, delimiter=",", unpack=True)
-    dyheu1b, dyheu1t, dyheu1_positives_mean, dyheu1_positives_stdev = np.loadtxt(file_dyheu1, delimiter=",", unpack=True)
-    dyheu2b, dyheu2t, dyheu2_positives_mean, dyheu2_positives_stdev = np.loadtxt(file_dyheu2, delimiter=",", unpack=True)
-    dyheu3b, dyheu3t, dyheu3_positives_mean, dyheu3_positives_stdev = np.loadtxt(file_dyheu3, delimiter=",", unpack=True)
+    if heu == "Heu1": heu = "$H_1$"
+    elif heu == "Heu2": heu = "$H_2$"
+    elif heu == "Heu3": heu = "$H_3$"
 
-    budget.insert(0, 0)
-    heu1_positives_mean = np.insert(heu1_positives_mean, 0, 0)
-    heu1_positives_stdev = np.insert(heu1_positives_stdev, 0, 0)
-    heu2_positives_mean = np.insert(heu2_positives_mean, 0, 0)
-    heu2_positives_stdev = np.insert(heu2_positives_stdev, 0, 0)
-    heu3_positives_mean = np.insert(heu3_positives_mean, 0, 0)
-    heu3_positives_stdev = np.insert(heu3_positives_stdev, 0, 0)
-    fakeheu1_positives_mean = np.insert(fakeheu1_positives_mean, 0, 0)
-    fakeheu1_positives_stdev = np.insert(fakeheu1_positives_stdev, 0, 0)
-    fakeheu2_positives_mean = np.insert(fakeheu2_positives_mean, 0, 0)
-    fakeheu2_positives_stdev = np.insert(fakeheu2_positives_stdev, 0, 0)
-    fakeheu3_positives_mean = np.insert(fakeheu3_positives_mean, 0, 0)
-    fakeheu3_positives_stdev = np.insert(fakeheu3_positives_stdev, 0, 0)
-    dyheu1_positives_mean = np.insert(dyheu1_positives_mean, 0, 0)
-    dyheu1_positives_stdev = np.insert(dyheu1_positives_stdev, 0, 0)
-    dyheu2_positives_mean = np.insert(dyheu2_positives_mean, 0, 0)
-    dyheu2_positives_stdev = np.insert(dyheu2_positives_stdev, 0, 0)
-    dyheu3_positives_mean= np.insert(dyheu3_positives_mean, 0, 0)
-    dyheu3_positives_stdev = np.insert(dyheu3_positives_stdev, 0, 0)
+    budget, time, heu_positives_mean, heu_positives_stdev = np.loadtxt(file_heu, delimiter=",", unpack=True)
+    fakeheub, fakeheut, fakeheu_positives_mean, fakeheu_positives_stdev = np.loadtxt(file_fakeheu, delimiter=",", unpack=True)
+    dy1heub, dy1heut, dy1heu_positives_mean, dy1heu_positives_stdev = np.loadtxt(file_dy1heu, delimiter=",", unpack=True)
+    # dy10heub, dy10heut, dy10heu_positives_mean, dy10heu_positives_stdev = np.loadtxt(file_dy10heu, delimiter=",", unpack=True)
+    # dy100heub, dy100heut, dy100heu_positives_mean, dy100heu_positives_stdev = np.loadtxt(file_dy100heu, delimiter=",", unpack=True)
 
-    heu1_line = plt.plot(budget, heu1_positives_mean, color="#ff0000", label="Heu1")
-    heu2_line = plt.plot(budget, heu2_positives_mean, color="#00ffff", label="Heu2")
-    heu3_line = plt.plot(budget, heu3_positives_mean, color="#bf00ff", label="Heu3")
-    fakeheu1_line = plt.plot(budget, fakeheu1_positives_mean, color="#ff8000", label="fakeHeu1")
-    fakeheu2_line = plt.plot(budget, fakeheu2_positives_mean, color="#0080ff", label="fakeHeu2")
-    fakeheu3_line = plt.plot(budget, fakeheu3_positives_mean, color="#ff0080", label="fakeHeu3")
-    dyheu1_line = plt.plot(budget, dyheu1_positives_mean, color="#ffff00", label="dyHeu1")
-    dyheu2_line = plt.plot(budget, dyheu2_positives_mean, color="#0000ff", label="dyHeu2")
-    dyheu3_line = plt.plot(budget, dyheu3_positives_mean, color="#ff0040", label="dyHeu3")
+    budget = np.insert(budget, 0, 0)
+    heu_positives_mean = np.insert(heu_positives_mean, 0, 0)
+    heu_positives_stdev = np.insert(heu_positives_stdev, 0, 0)
+    fakeheu_positives_mean = np.insert(fakeheu_positives_mean, 0, 0)
+    fakeheu_positives_stdev = np.insert(fakeheu_positives_stdev, 0, 0)
+    dy1heu_positives_mean = np.insert(dy1heu_positives_mean, 0, 0)
+    dy1heu_positives_stdev = np.insert(dy1heu_positives_stdev, 0, 0)
+    # dy10heu_positives_mean = np.insert(dy10heu_positives_mean, 0, 0)
+    # dy10heu_positives_stdev = np.insert(dy10heu_positives_stdev, 0, 0)
+    # dy100heu_positives_mean = np.insert(dy100heu_positives_mean, 0, 0)
+    # dy100heu_positives_stdev = np.insert(dy100heu_positives_stdev, 0, 0)
 
-    # plt.errorbar(budget, heu1_positives_mean, yerr=heu1_positives_stdev, color="#ff0000")
-    # plt.errorbar(budget, heu2_positives_mean, yerr=heu2_positives_stdev, color="#00ffff")
-    # plt.errorbar(budget, heu3_positives_mean, yerr=heu3_positives_stdev, color="#bf00ff")
-    # plt.errorbar(budget, fakeheu1_positives_mean, yerr=fakeheu1_positives_stdev, color="#ff8000")
-    # plt.errorbar(budget, fakeheu2_positives_mean, yerr=fakeheu2_positives_stdev, color="#0080ff")
-    # plt.errorbar(budget, fakeheu3_positives_mean, yerr=fakeheu3_positives_stdev, color="#ff0080")
-    # plt.errorbar(budget, dyheu1_positives_mean, yerr=dyheu1_positives_stdev, color="#ffff00")
-    # plt.errorbar(budget, dyheu2_positives_mean, yerr=dyheu2_positives_stdev, color="#0000ff")
-    # plt.errorbar(budget, dyheu3_positives_mean, yerr=dyheu3_positives_stdev, color="#ff0040")
+    heu_line = plt.plot(budget, heu_positives_mean, marker="D", markersize=4, markeredgewidth=1, markeredgecolor="k",
+        markerfacecolor="None", color="k", label=heu)
+    fakeheu_line = plt.plot(budget, fakeheu_positives_mean, marker="v", markersize=4, markeredgewidth=1, markeredgecolor="m",
+        markerfacecolor="None", color="m", label="$sym$"+heu)
+    dy1heu_line = plt.plot(budget, dy1heu_positives_mean, marker="p", markersize=4, markeredgewidth=1, markeredgecolor="c",
+        markerfacecolor="None", color="c", label="$dy$"+heu)
+    # dy10heu_line = plt.plot(budget, dy10heu_positives_mean, marker="^", markersize=4, markeredgewidth=1, markeredgecolor="r",
+    #     markerfacecolor="None", color="r", label="dy10"+heu)
+    # dy100heu_line = plt.plot(budget, dy100heu_positives_mean, marker="s", markersize=4, markeredgewidth=1, markeredgecolor="g",
+    #     markerfacecolor="None", color="g", label="dy100"+heu)
 
-    plt.xticks(np.arange(0, max(budget)+21, 20.0), fontsize = 9)
-    plt.yticks(np.arange(0, max([max(heu1_positives_mean), max(heu2_positives_mean),
-        max(heu3_positives_mean), max(fakeheu1_positives_mean), max(fakeheu2_positives_mean),
-        max(fakeheu3_positives_mean), max(dyheu1_positives_mean), max(dyheu2_positives_mean),
-        max(dyheu3_positives_mean)])+11, 5.0), fontsize = 9)
+    if bar == "yes":
+        plt.errorbar(budget, heu_positives_mean, yerr=heu_positives_stdev, color="k", elinewidth=.3)
+        plt.errorbar(budget, fakeheu_positives_mean, yerr=fakeheu_positives_stdev, color="m", elinewidth=.3)
+        plt.errorbar(budget, dy1heu_positives_mean, yerr=dy1heu_positives_stdev, color="c", elinewidth=.3)
+        # plt.errorbar(budget, dy10heu_positives_mean, yerr=dy10heu_positives_stdev, color="r", elinewidth=.3)
+        # plt.errorbar(budget, dy100heu_positives_mean, yerr=dy100heu_positives_stdev, color="g", elinewidth=.3)
 
+    plt.xticks(np.arange(1000, max(budget)+111111.0, 2000.0), fontsize = 7, rotation=60)
+    # plt.yticks(np.arange(0, max([max(heu_positives_mean), max(fakeheu_positives_mean),
+    #     max(dy1heu_positives_mean), max(dy10heu_positives_mean), max(dy100heu_positives_mean)])+1.1, 1.0), fontsize = 7)
+    # plt.yticks(np.arange(0, max([max(heu_positives_mean), max(fakeheu_positives_mean)])+111111.0, 10.0), fontsize = 7)
+    plt.yticks(np.arange(0, max([max(heu_positives_mean), max(fakeheu_positives_mean),
+        max(dy1heu_positives_mean)])+111111.0, 10.0), fontsize = 7)
+
+    plt.xlim((0, 37000))
+    plt.ylim((0, 120))
     # plt.grid(True)
 
-    plt.ylabel("vertices positivos", fontsize=9)
-    plt.xlabel("vertices explorados", fontsize=9)
+    plt.ylabel("# vertices positivos", fontsize=9)
+    plt.xlabel("# vertices explorados", fontsize=9)
 
     plt.legend(loc="upper left", fontsize=11)
+
+    plt.title("P2P", fontsize=11)
 
     plt.savefig(exit_file)
     plt.clf()
@@ -80,12 +75,23 @@ def main(file_heu1, file_heu2, file_heu3, file_fakeheu1, file_fakeheu2, file_fak
 
 if __name__ == "__main__":
     #
-    # sys.argv[1] - sys.argv[10] corresponde ao csv's com os resultados das buscas
+    # sys.argv[1] corresponde ao tipo da heuristica
     #
-    if len(sys.argv) != 11:
-        print "err: missing params. the program need 10 params."
+    # sys.argv[2] - sys.argv[6] corresponde ao csv's com os resultados das buscas
+    #
+    if len(sys.argv) != 9:
+        print "err: missing params. the program need 8 params."
     else:
-        main(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7], sys.argv[8],
-            sys.argv[9], sys.argv[10])
+        main(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7], sys.argv[8])
 
-    # plotheu.py "textgraphs/textgraphs_HEU1.search.csv" "textgraphs/textgraphs_HEU2.search.csv" "textgraphs/textgraphs_HEU3.search.csv" "textgraphs/textgraphs_fakeHEU1.search.csv" "textgraphs/textgraphs_fakeHEU2.search.csv" "textgraphs/textgraphs_fakeHEU3.search.csv" "textgraphs/textgraphs_dyHEU1.search.csv" "textgraphs/textgraphs_dyHEU2.search.csv" "textgraphs/textgraphs_dyHEU3.search.csv" "textgraphs/HEUtextgraphs.png"
+    # plotheu.py "Heu1" "200k_textgraphs/heus50r/200k_HEU1.search.csv" "200k_textgraphs/heus50r/200k_fakeHEU1.search.csv" "200k_textgraphs/heus50r/200k_dy1HEU1.search.csv" "200k_textgraphs/heus50r/200k_dy10HEU1.search.csv" "200k_textgraphs/heus50r/200k_dy100HEU1.search.csv" "200k_textgraphs/heus50r/s_heu1.png" no
+    # plotheu.py "Heu2" "200k_textgraphs/heus50r/200k_HEU2.search.csv" "200k_textgraphs/heus50r/200k_fakeHEU2.search.csv" "200k_textgraphs/heus50r/200k_dy1HEU2.search.csv" "200k_textgraphs/heus50r/200k_dy10HEU2.search.csv" "200k_textgraphs/heus50r/200k_dy100HEU2.search.csv" "200k_textgraphs/heus50r/s_heu2.png" no
+    # plotheu.py "Heu3" "200k_textgraphs/heus50r/200k_HEU3.search.csv" "200k_textgraphs/heus50r/200k_fakeHEU3.search.csv" "200k_textgraphs/heus50r/200k_dy1HEU3.search.csv" "200k_textgraphs/heus50r/200k_dy10HEU3.search.csv" "200k_textgraphs/heus50r/200k_dy100HEU3.search.csv" "200k_textgraphs/heus50r/s_heu3.png" no
+
+    # plotheu.py "Heu1" "200k_p2p/heus50r/200k_HEU1.search.csv" "200k_p2p/heus50r/200k_fakeHEU1.search.csv" "200k_p2p/heus50r/200k_dy1HEU1.search.csv" "200k_p2p/heus50r/200k_dy10HEU1.search.csv" "200k_p2p/heus50r/200k_dy100HEU1.search.csv" "200k_p2p/heus50r/s_heu1.png" no
+    # plotheu.py "Heu2" "200k_p2p/heus50r/200k_HEU2.search.csv" "200k_p2p/heus50r/200k_fakeHEU2.search.csv" "200k_p2p/heus50r/200k_dy1HEU2.search.csv" "200k_p2p/heus50r/200k_dy10HEU2.search.csv" "200k_p2p/heus50r/200k_dy100HEU2.search.csv" "200k_p2p/heus50r/s_heu2.png" no
+    # plotheu.py "Heu3" "200k_p2p/heus50r/200k_HEU3.search.csv" "200k_p2p/heus50r/200k_fakeHEU3.search.csv" "200k_p2p/heus50r/200k_dy1HEU3.search.csv" "200k_p2p/heus50r/200k_dy10HEU3.search.csv" "200k_p2p/heus50r/200k_dy100HEU3.search.csv" "200k_p2p/heus50r/s_heu3.png" no
+
+    # plotheu.py "Heu1" "200k_group2/heus50r/200k_HEU1.search.csv" "200k_group2/heus50r/200k_fakeHEU1.search.csv" "200k_group2/heus50r/200k_dy1HEU1.search.csv" "200k_group2/heus50r/200k_dy10HEU1.search.csv" "200k_group2/heus50r/200k_dy100HEU1.search.csv" "200k_group2/heus50r/s_heu1.png" no
+    # plotheu.py "Heu2" "200k_group2/heus50r/200k_HEU2.search.csv" "200k_group2/heus50r/200k_fakeHEU2.search.csv" "200k_group2/heus50r/200k_dy1HEU2.search.csv" "200k_group2/heus50r/200k_dy10HEU2.search.csv" "200k_group2/heus50r/200k_dy100HEU2.search.csv" "200k_group2/heus50r/s_heu2.png" no
+    # plotheu.py "Heu3" "200k_group2/heus50r/200k_HEU3.search.csv" "200k_group2/heus50r/200k_fakeHEU3.search.csv" "200k_group2/heus50r/200k_dy1HEU3.search.csv" "200k_group2/heus50r/200k_dy10HEU3.search.csv" "200k_group2/heus50r/200k_dy100HEU3.search.csv" "200k_group2/heus50r/s_heu3.png" no

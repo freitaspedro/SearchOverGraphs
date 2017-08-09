@@ -141,19 +141,19 @@ def graph_values_to_list(graph, num_v, filename):
 
 if __name__ == "__main__":
     generate_graph("snap/facebook/1912", "240")
-    get_gcc("snap/facebook/1912/f240/g.xml.gz")
-    count_positives("snap/facebook/1912/f240/gcc.xml.gz", "240")
-    calculate_edges("snap/facebook/1912/f240/gcc.xml.gz")
-    # get_starts("snap/facebook/1912/f119/gcc.xml.gz", 50, "fb")         # executa uma vez por egonet
-    # graph_to_list("snap/facebook/1912/f119/gcc.xml.gz", 747, "snap/facebook/1912/neighbours")            # executa uma vez por egonet
-    graph_values_to_list("snap/facebook/1912/f240/gcc.xml.gz", 747, "snap/facebook/1912/f240/values")
-    get_positive_subgraph("snap/facebook/1912/f240/gcc.xml.gz", "snap/facebook/1912/f240/positives_gcc.xml.gz")
+    # get_gcc("snap/facebook/1912/f240/g.xml.gz")
+    # count_positives("snap/facebook/1912/f240/gcc.xml.gz", "240")
+    # calculate_edges("snap/facebook/1912/f240/gcc.xml.gz")
+    # get_starts("snap/facebook/1912/f119/gcc.xml.gz", 100, "fb")         # executa uma vez por egonet
+    # # graph_to_list("snap/facebook/1912/f119/gcc.xml.gz", 747, "snap/facebook/1912/neighbours")            # executa uma vez por egonet
+    # graph_values_to_list("snap/facebook/1912/f240/gcc.xml.gz", 747, "snap/facebook/1912/f240/values")
+    # get_positive_subgraph("snap/facebook/1912/f240/gcc.xml.gz", "snap/facebook/1912/f240/positives_gcc.xml.gz")
 
     # generate_graph("snap/gplus/116807883656585676940", "862")
     # get_gcc("snap/gplus/116807883656585676940/f862/g.xml.gz")
     # count_positives("snap/gplus/116807883656585676940/f862/gcc.xml.gz", "862")
     # calculate_edges("snap/gplus/116807883656585676940/f862/gcc.xml.gz")
-    # # get_starts("snap/gplus/116807883656585676940/f0/gcc.xml.gz", 50, "gplus")      # executa uma vez por egonet
+    # get_starts("snap/gplus/116807883656585676940/f0/gcc.xml.gz", 100, "gplus")      # executa uma vez por egonet
     # # graph_to_list("snap/gplus/116807883656585676940/f0/gcc.xml.gz", 4872, "snap/gplus/116807883656585676940/neighbours")            # executa uma vez por egonet
     # graph_values_to_list("snap/gplus/116807883656585676940/f862/gcc.xml.gz", 4872, "snap/gplus/116807883656585676940/f862/values")
     # get_positive_subgraph("snap/gplus/116807883656585676940/f862/gcc.xml.gz", "snap/gplus/116807883656585676940/f862/positives_gcc.xml.gz")
@@ -161,7 +161,7 @@ if __name__ == "__main__":
     # get_gcc("uci/polblogs/polblogs.gml")
     # count_positives("uci/polblogs/polblogs.gcc.xml.gz", "-1")
     # calculate_edges("uci/polblogs/polblogs.gcc.xml.gz")
-    # get_starts("uci/polblogs/polblogs.gcc.xml.gz", 50, "polblogs")
+    # get_starts("uci/polblogs/polblogs.gcc.xml.gz", 100, "polblogs")
     # graph_to_list("uci/polblogs/polblogs.gcc.xml.gz", 1490, "uci/polblogs/neighbours")
     # graph_values_to_list("uci/polblogs/polblogs.gcc.xml.gz", 1490, "uci/polblogs/values")
     # get_positive_subgraph("uci/polblogs/polblogs.gcc.xml.gz", "uci/polblogs/positives_gcc.xml.gz")

@@ -6,7 +6,7 @@ do graph-tool, sem numpy e usando valores previamente calculados para as heurist
 '''
 
 import math
-import scipy
+import scipy.special as sp
 import time
 
 MapDyHeu1 = {}
@@ -66,8 +66,7 @@ def p_t_k(k, kt, kn, pt_t, pd_t):
     end = min(kt, k)
     sum_k = 0
     for i in xrange(ini, end):
-        sum_k += scipy.special.binom(kt, i) * math.pow(pt_t, i) * math.pow(1-pt_t, kt-i) * scipy.special.binom(kn, k-i) * math.pow(pd_t, k-i) \
-        * math.pow(1-pd_t, kn-k+i)
+        sum_k += sp.binom(kt, i) * math.pow(pt_t, i) * math.pow(1-pt_t, kt-i) * sp.binom(kn, k-i) * math.pow(pd_t, k-i) * math.pow(1-pd_t, kn-k+i)
     return sum_k
 
 def dyheuristic(pt_t, pd_t, kt, kn, mtype):

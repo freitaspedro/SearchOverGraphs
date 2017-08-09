@@ -8,14 +8,14 @@ entrada pt_t, pd_t, ini e end
 import math
 import scipy.special as sp
 import sys
+import ast
 
 def p_t_k(k, kt, kn, pt_t, pd_t):
     ini = max(0, k-kn)
     end = min(kt, k)
     sum_k = 0
     for i in xrange(ini, end):
-        sum_k += sp.binom(kt, i) * math.pow(pt_t, i) * math.pow(1-pt_t, kt-i) * sp.binom(kn, k-i) * math.pow(pd_t, k-i) \
-        * math.pow(1-pd_t, kn-k+i)
+        sum_k += sp.binom(kt, i) * math.pow(pt_t, i) * math.pow(1-pt_t, kt-i) * sp.binom(kn, k-i) * math.pow(pd_t, k-i) * math.pow(1-pd_t, kn-k+i)
     return sum_k
 
 def heu1(pt_t, pd_t, ini, end, out_file):
@@ -28,6 +28,7 @@ def heu1(pt_t, pd_t, ini, end, out_file):
 
 def heu2(pt_t, pd_t, ini, end, out_file):
     MapHeu2 = {}
+    cnt = 0
     for kt in range(ini, end):
         for kn in range(ini, end):
             pm = 0
@@ -36,8 +37,9 @@ def heu2(pt_t, pd_t, ini, end, out_file):
             for i in xrange(inis, ends):
                 pm += p_t_k(i, kt, kn, pt_t, pd_t)
             MapHeu2[(kt, kn)] = pm
-    # write_dict(MapHeu2, out_file)
-    wappend_dict(MapHeu2, out_file)
+        cnt += 1
+        if not cnt % 10: print cnt
+    write_dict(MapHeu2, out_file)
 
 def heu3(pt_t, pd_t, ini, end, out_file):
     MapHeu3 = {}
@@ -53,6 +55,62 @@ def write_dict(mdict, out_file):
             f.write("%s:%s\n" % (key, value))
     print "%s saved" % out_file
 
+def load_dict(filename):
+    mlist = []
+    with open(filename, "rb") as f:
+        for row in f:
+            kt, kn = row.split(":", 1)
+            kt = ast.literal_eval(kt)
+            kn = ast.literal_eval(kn.rstrip("\n"))
+            mlist.append((kt, kn))
+    return mlist
+
+def kt_kn_heu1(pt_t, pd_t, ini, end, out_file):
+    # kt_kn = load_dict("kt_kn")
+    kt_kn = load_dict("kt_kn_100")
+    kt_kn = kt_kn[ini: end]
+    MapHeu1 = {}
+    cnt = 0
+    for kt, kn in kt_kn:
+        pfor = math.pow(pt_t, kt) * math.pow(pd_t, kn)
+        MapHeu1[(kt, kn)] = pfor
+        cnt += 1
+        if not cnt % 1000: print cnt
+    write_dict(MapHeu1, out_file)
+    # wappend_dict(MapHeu1, out_file)
+
+def kt_kn_heu2(pt_t, pd_t, ini, end, out_file):
+    # kt_kn = load_dict("kt_kn")
+    kt_kn = load_dict("kt_kn_100")
+    kt_kn = kt_kn[ini: end]
+    MapHeu2 = {}
+    cnt = 0
+    for kt, kn in kt_kn:
+        pm = 0
+        inis = int(math.ceil((kt+kn)/2.0))
+        ends = kt+kn
+        for i in xrange(inis, ends):
+            pm += p_t_k(i, kt, kn, pt_t, pd_t)
+        MapHeu2[(kt, kn)] = pm
+        cnt += 1
+        if not cnt % 1000: print cnt
+    write_dict(MapHeu2, out_file)
+    # wappend_dict(MapHeu2, out_file)
+
+def kt_kn_heu3(pt_t, pd_t, ini, end, out_file):
+    # kt_kn = load_dict("kt_kn")
+    kt_kn = load_dict("kt_kn_100")
+    kt_kn = kt_kn[ini: end]
+    MapHeu3 = {}
+    cnt = 0
+    for kt, kn in kt_kn:
+        pfra = 1 - math.pow(1-pt_t, kt) * math.pow(1-pd_t, kn)
+        MapHeu3[(kt, kn)] = pfra
+        cnt += 1
+        if not cnt % 1000: print cnt
+    write_dict(MapHeu3, out_file)
+    # wappend_dict(MapHeu3, out_file)
+
 def wappend_dict(mdict, out_file):
     with open(out_file, "a") as f:
         for key, value in mdict.items():
@@ -61,8 +119,11 @@ def wappend_dict(mdict, out_file):
 
 def main(pt_t, pd_t, ini, end, out_file):
     # heu1(pt_t, pd_t, ini, end+1, out_file+"_HEU1_pre")
-    heu2(pt_t, pd_t, ini, end+1, out_file+"_HEU2_pre")        # 0 - 315 / cluster
+    # heu2(pt_t, pd_t, ini, end+1, out_file+"_HEU2_pre")
     # heu3(pt_t, pd_t, ini, end+1, out_file+"_HEU3_pre")
+    # kt_kn_heu1(pt_t, pd_t, ini, end, out_file+"_HEU1_pre")
+    # kt_kn_heu2(pt_t, pd_t, ini, end, out_file+"_HEU2_pre")
+    kt_kn_heu3(pt_t, pd_t, ini, end, out_file+"_HEU3_pre")
 
 
 if __name__ == "__main__":
@@ -97,3 +158,5 @@ if __name__ == "__main__":
         # precalc.py 0.5 0.5 0 1254 "immerscom/immerscom_gcc_dblp_g_fake"
         # precalc.py 0.5 0.5 0 1254 "socialcom/socialcom_gcc_dblp_g_fake"
         # precalc.py 0.5 0.5 0 1254 "aaai/aaai_gcc_dblp_g_fake"
+
+        # precalc.py 0.5 0.5 0 10201 "200k_textgraphs/textgraphs_gcc_200k_dblp_g_fake"

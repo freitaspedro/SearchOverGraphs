@@ -40,7 +40,11 @@ def load_dict(filename):
         for row in f:
             key, value = row.split(":", 1)
             key = ast.literal_eval(key)
-            value = ast.literal_eval(value.rstrip("\n"))
+            value = value.rstrip("\n")
+            if value == "nan":
+                value = 1.0
+            else:
+                value = ast.literal_eval(value)
             mdict[key] = value
     return mdict
 
@@ -59,14 +63,15 @@ def main(starts_file, neighbours_file, values_file, ini=1, initial_budget=0, ste
 
     preheu1 = load_dict(values_file+"_HEU1_pre")
     # print preheu1[(52, 98)]     # (52, 98):4.49640152562e-236
-    # preheu2 = load_dict(values_file+"_HEU2_pre")
-    # print preheu2[(51, 121)]     # (51, 121):1.0
+    preheu2 = load_dict(values_file+"_HEU2_pre")
+    # print preheu2[(2, 1132)]     # (2, 1132):nan
+    # print preheu2[(2, 642)] # (2, 642):0.999999998991
     preheu3 = load_dict(values_file+"_HEU3_pre")
     # print preheu3[(90, 5)]     # (90, 5):0.999999958711
 
     fake_preheu1 = load_dict(values_file+"_fake_HEU1_pre")
     # print fake_preheu1[(52, 98)]      # (52, 98):7.00649232162e-46
-    # fake_preheu2 = load_dict(values_file+"_fake_HEU2_pre")
+    fake_preheu2 = load_dict(values_file+"_fake_HEU2_pre")
     # print fake_preheu2[(51, 121)]     # (51, 121):0.530374882313
     fake_preheu3 = load_dict(values_file+"_fake_HEU3_pre")
     # print fake_preheu3[(90, 5)]       # (90, 5):1.0
