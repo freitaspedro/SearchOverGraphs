@@ -1,0 +1,127 @@
+feat icc - 24945 positives (2.23739832148 percent)
+feat socialcom - 1886 positives (0.169161484639 percent)
+feat infocom - 10870 positives (0.974965714752 percent)
+feat mobicom - 3643 positives (0.326752538992 percent)
+feat globecom - 23324 positives (2.09200555022 percent)
+
+feat broadcom - 164 positives (0.0147096943164 percent)
+feat sigmod - 6048 positives (0.542464824547 percent)
+feat mobihoc - 1977 positives (0.177323571119 percent)
+feat adhocnets - 603 positives (0.0540850345902 percent)
+
+feat sbrc - 263 positives (0.0235893268611 percent)
+feat complenet - 331 positives (0.0296884684069 percent)
+feat icccn - 5591 positives (0.501475005628 percent)
+feat sbsc - 132 positives (0.0118395100595 percent)
+feat icnp - 2314 positives (0.207550199074 percent)
+
+feat sigmetrics - 2733 positives (0.245131674187 percent)
+feat sigcomm - 3767 positives (0.337874502987 percent)
+feat cosn - 230 positives (0.0206294493462 percent)
+feat conext - 1586 positives (0.142253507231 percent)
+feat netsci - 54 positives (0.00484343593345 percent)
+feat www - 10571 positives (0.948147430602 percent)
+feat p2p - 1159 positives (0.103954486053 percent)
+
+feat iscas - 25699 positives (2.30502703803 percent)
+feat icra - 24417 positives (2.19004028124 percent)
+feat icassp - 32672 positives (2.93045812625 percent)
+feat igarss - 22999 positives (2.06285524136 percent)
+feat icip - 25215 positives (2.26161550115 percent)
+feat iros - 22504 positives (2.01845707864 percent)
+
+feat icmcs - 14163 positives (1.27032561343 percent)
+feat ipps - 13864 positives (1.24350732928 percent)
+feat aaai - 13278 positives (1.19094708008 percent)
+feat amia - 12346 positives (1.1073529636 percent)
+feat smc - 19021 positives (1.70605546093 percent)
+feat vtc - 19273 positives (1.72865816195 percent)
+feat wcnc - 14285 positives (1.28126819091 percent)
+feat hci - 22135 positives (1.98536026642 percent)
+feat ijcnn - 11899 positives (1.06726007726 percent)
+feat sac - 12956 positives (1.162065851 percent)
+feat siggraph - 11896 positives (1.06699099749 percent)
+feat icpr - 15375 positives (1.37903384216 percent)
+feat cvpr - 12741 positives (1.14278180052 percent)
+feat cdc - 12364 positives (1.10896744224 percent)
+feat interspeech - 17111 positives (1.5347413381 percent)
+feat eusipco - 13712 positives (1.22987395406 percent)
+feat hicss - 17155 positives (1.53868784145 percent)
+feat chi - 18294 positives (1.64084846234 percent)
+feat pimrc - 14277 positives (1.28055064485 percent)
+
+feat textgraphs - 125 positives (0.0112116572534 percent)
+feat immerscom - 122 positives (0.0109425774793 percent)
+
+############################################################
+
+##### .01%
+feat sbsc - 132 positives (0.0118395100595 percent)
+
+feat broadcom - 164 positives (0.0147096943164 percent)
+
+feat textgraphs - 125 positives (0.0112116572534 percent) pt: 3.1730492945e-05 pd: 0.000919009091961 pn: 0.999049260415
+pt_t: 3.175968038e-05 pd_t: 0.966625463535
+
+feat immerscom - 122 positives (0.0109425774793 percent) pt: 3.70189084358e-05 pd: 0.000994417979516 pn: 0.998968563112
+pt_t: 3.70557573471e-05 pd_t: 0.964109380934
+
+
+##### .1%
+feat conext - 1586 positives (0.142253507231 percent)
+
+feat p2p - 1159 positives (0.103954486053 percent) pt: 0.000646949495044 pd: 0.0107272570223 pn: 0.988625793483
+pt_t: 0.000653964742925 pd_t: 0.943121351449
+
+feat socialcom - 1886 positives (0.169161484639 percent) pt: 0.000884536457651 pd: 0.0148641690068 pn: 0.984251294536
+pt_t: 0.000897882738423 pd_t: 0.943834338661
+
+feat mobihoc - 1977 positives (0.177323571119 percent)
+
+
+##### 1%
+feat www - 10571 positives (0.948147430602 percent)
+
+feat aaai - 13278 positives (1.19094708008 percent) pt: 0.0137332315607 pd: 0.0832576796117 pn: 0.903009088828
+pt_t: 0.0149804707989 pd_t: 0.858407026033
+
+feat siggraph - 11896 positives (1.06699099749 percent)
+
+feat wcnc - 14285 positives (1.28126819091 percent) pt: 0.0145578326428 pd: 0.0802338811544 pn: 0.905208286203
+pt_t: 0.0158277548439 pd_t: 0.846422940786
+
+feat icpr - 15375 positives (1.37903384216 percent)
+
+
+##### 10%
+###group 1
+feat icassp - 32672 positives (2.93045812625 percent) +
+feat icip - 25215 positives (2.26161550115 percent) +
+feat icmcs - 14163 positives (1.27032561343 percent) +
+feat interspeech - 17111 positives (1.5347413381 percent) +
+feat hci - 22135 positives (1.98536026642 percent) +
+feat chi - 18294 positives (1.64084846234 percent) +
+feat siggraph - 11896 positives (1.06699099749 percent)
+###feat ['icassp', 'icip', 'icmcs', 'interspeech', 'hci', 'chi', 'siggraph'] - 114716 positives (10.2892517878 percent)
+pt: 0.114702989855 pd: 0.236487951521 pn: 0.648809058625 pt_t: 0.150230752852 pd_t: 0.673388529313
+
+
+###group 2
+feat iscas - 25699 positives (2.30502703803 percent) +
+feat icra - 24417 positives (2.19004028124 percent) +
+feat iros - 22504 positives (2.01845707864 percent) +
+feat smc - 19021 positives (1.70605546093 percent) +
+feat vtc - 19273 positives (1.72865816195 percent) +
+feat eusipco - 13712 positives (1.22987395406 percent)
+###feat ['iscas', 'icra', 'iros', 'smc', 'vtc', 'eusipco'] - 105760 positives (9.48595896892 percent)
+pt: 0.0987850550945 pd: 0.227824155876 pn: 0.67339078903 pt_t: 0.127930776191 pd_t: 0.697543572635
+
+
+#incomplete
+feat icc - 24945 positives (2.23739832148 percent) +
+feat globecom - 23324 positives (2.09200555022 percent) +
+feat wcnc - 14285 positives (1.28126819091 percent) +
+feat pimrc - 14277 positives (1.28055064485 percent)
+
+#incomplete
+feat igarss - 22999 positives (2.06285524136 percent)
